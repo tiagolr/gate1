@@ -366,7 +366,7 @@
     <ClInclude Include="..\src\GATE2.h" />
     <ClInclude Include="..\src\Pattern.h" />
     <ClInclude Include="..\src\View.h" />
-    <ClInclude Include="..\src\config.h" />
+    <ClInclude Include="..\config.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -448,5 +448,8 @@
     <None Include="..\config\GATE2-mac.xcconfig">
       <Filter>config</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\GATE2.ico" />
   </ItemGroup>
 </Project>

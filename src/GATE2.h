@@ -16,9 +16,9 @@ enum EParams
   kMin,
   kMax,
   kSmooth,
-  kAttSmooth,
-  kRelSmooth,
-  kTensionMult,
+  kAttack,
+  kRelease,
+  kTension,
   kRetrigger,
   kSnap,
   kGrid,
@@ -41,16 +41,32 @@ using namespace igraphics;
 class GATE2 final : public Plugin
 {
 public:
+  bool inited = false;
   bool snap = false;
   int gridSegs = 8;
   bool linkEdgePoints = false;
+  bool dualSmooth = true;
 
   static const IColor COLOR_BG;
   static const IColor COLOR_ACTIVE;
+  static const IColor COLOR_ACTIVE_DARK;
+  static const IColor COLOR_ACTIVE_LIGHT;
 
   Pattern* pattern;
   Pattern* patterns[12];
   View* view;
+  IVTabSwitchControl* patternSwitches;
+  ICaptionControl* syncControl;
+  IVKnobControl* rateControl;
+  IVKnobControl* minControl;
+  IVKnobControl* maxControl;
+  IVKnobControl* smoothControl;
+  IVKnobControl* attackControl;
+  IVKnobControl* releaseControl;
+  IVKnobControl* tensionControl;
+  ICaptionControl* pointModeControl;
+  ICaptionControl* paintModeControl;
+  IVToggleControl* snapControl;
 
   GATE2(const InstanceInfo& info);
 

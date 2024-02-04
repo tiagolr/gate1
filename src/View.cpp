@@ -23,7 +23,6 @@ void View::OnResize() {
 }
 
 void View::Draw(IGraphics& g) {
-  g.DrawRect(COLOR_GRAY, mRECT);
   drawGrid(g);
   drawSegments(g);
   drawMidPoints(g);
@@ -194,7 +193,7 @@ void View::OnMouseDrag(float x, float y, float dX, float dY, const IMouseMod& mo
   double gridy = double(winh) / grid;
   double xx = (double)x;
   double yy = (double)y;
-  if (isSnapping()) {
+  if (isSnapping(mod)) {
     xx = round((xx - winx) / gridx) * gridx + winx;
     yy = round((yy - winy) / gridy) * gridy + winy;
   }
@@ -264,7 +263,7 @@ void View::OnMouseDblClick(float x, float y, const IMouseMod& mod)
   if (pt == -1 && mid == -1) {
     int px = (int)x;
     int py = (int)y;
-    if (isSnapping()) {
+    if (isSnapping(mod)) {
       int grid = (double)gate.gridSegs;
       double gridx = double(winw) / grid;
       double gridy = double(winh) / grid;
@@ -285,8 +284,9 @@ void View::OnMouseDblClick(float x, float y, const IMouseMod& mod)
 
 // ==================================================
 
-bool View::isSnapping() {
-  return gate.snap;
+bool View::isSnapping(const IMouseMod& mod) {
+  bool snap = gate.GetParam(kSnap)->Value() == 1;
+  return (snap && !mod.C) || (!snap && mod.C);
 }
 
 bool View::isCollinear(Segment seg)

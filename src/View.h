@@ -52,7 +52,7 @@ private:
   double origTension = 0;
   int dragStartY = 0;
 
-  bool isSnapping();
+  bool isSnapping(const IMouseMod& mod);
   bool isCollinear(Segment seg);
   bool pointInRect(int x, int y, int xx, int yy, int w, int h);
 };

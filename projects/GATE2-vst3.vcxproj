@@ -326,8 +326,8 @@
     <ClInclude Include="..\..\..\IPlug\VST3\IPlugVST3_Parameter.h" />
     <ClInclude Include="..\..\..\IPlug\VST3\IPlugVST3_ProcessorBase.h" />
     <ClInclude Include="..\..\..\IPlug\VST3\IPlugVST3_View.h" />
+    <ClInclude Include="..\config.h" />
     <ClInclude Include="..\resources\resource.h" />
-    <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\GATE2.h" />
     <ClInclude Include="..\src\Pattern.h" />
     <ClInclude Include="..\src\View.h" />
@@ -406,6 +406,9 @@
     <None Include="..\config\GATE2-win.props">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\GATE2.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

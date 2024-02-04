@@ -128,7 +128,7 @@ void Pattern::loadRandom(int grid) {
 double Pattern::get_y_curve(Segment seg, double x)
 {
     auto rise = seg.y1 > seg.y2;
-    auto tmult = gate.GetParam(kTensionMult)->Value();
+    auto tmult = gate.GetParam(kTension)->Value();
     auto ten = seg.tension + (rise ? -tmult / 100 : tmult / 100);
     if (ten > 1) ten = 1;
     if (ten < -1) ten = -1;
