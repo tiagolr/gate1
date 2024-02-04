@@ -253,7 +253,6 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\..\..\Dependencies\IPlug\VST3_SDK\base\source\classfactoryhelpers.h" />
     <ClInclude Include="..\..\..\Dependencies\IPlug\VST3_SDK\base\source\fbuffer.h" />
     <ClInclude Include="..\..\..\Dependencies\IPlug\VST3_SDK\base\source\fcleanup.h" />
@@ -328,6 +327,7 @@
     <ClInclude Include="..\..\..\IPlug\VST3\IPlugVST3_ProcessorBase.h" />
     <ClInclude Include="..\..\..\IPlug\VST3\IPlugVST3_View.h" />
     <ClInclude Include="..\resources\resource.h" />
+    <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\GATE2.h" />
     <ClInclude Include="..\src\Pattern.h" />
     <ClInclude Include="..\src\View.h" />

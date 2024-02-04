@@ -41,6 +41,10 @@ using namespace igraphics;
 class GATE2 final : public Plugin
 {
 public:
+  bool snap = false;
+  int gridSegs = 8;
+  bool linkEdgePoints = false;
+
   static const IColor COLOR_BG;
   static const IColor COLOR_ACTIVE;
 
@@ -57,6 +61,7 @@ public:
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
   void ProcessMidiMsg(const IMidiMsg& msg) override;
   void OnIdle() override;
+  void OnParamChange(int paramIdx) override;
 
   void layoutControls(IGraphics* g);
 

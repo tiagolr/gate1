@@ -20,6 +20,8 @@ GATE2::GATE2(const InstanceInfo& info)
   GetParam(kAttSmooth)->InitDouble("Attack", 0, 0, 100, 1);
   GetParam(kRelSmooth)->InitDouble("Release", 0, 0, 100, 1);
   GetParam(kTensionMult)->InitDouble("Tension", 0, -100, 100, 1);
+  GetParam(kPaintMode)->InitEnum("Paint", 1, 5, "", 0, "", "Erase", "Line", "Saw up", "Saw Down", "Triangle");
+  GetParam(kPointMode)->InitEnum("Point", 1, 8, "", 0, "", "Hold", "Curve", "S-Curve", "Pulse", "Wave", "Triangle", "Stairs", "Smooth Stairs");
 
   // init patterns
   for (int i = 0; i < 12; i++) {
@@ -31,42 +33,49 @@ GATE2::GATE2(const InstanceInfo& info)
   }
   pattern = patterns[0];
 
-  // makeGraphicsFunc
   mMakeGraphicsFunc = [&]() {
     return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS);
   };
 
-
-  // layoutFunc
-  mLayoutFunc = [&](IGraphics* pGraphics) {
-    const IRECT b = pGraphics->GetBounds();
+  mLayoutFunc = [&](IGraphics* g) {
+    g->EnableMouseOver(true);
+    const IRECT b = g->GetBounds();
 
     // Layout controls on resize
-    if(pGraphics->NControls()) {
-      layoutControls(pGraphics);
+    if(g->NControls()) {
+      layoutControls(g);
       return;
     }
 
-    pGraphics->SetLayoutOnResize(true);
-    //pGraphics->AttachCornerResizer(EUIResizerMode::Size, true);
-    pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
-    //pGraphics->AttachPopupMenuControl();
+    g->SetLayoutOnResize(true);
+    g->LoadFont("Roboto-Regular", ROBOTO_FN);
 
     //Create controls
     IRECT rect;
     view = new View(rect, *this);
-    pGraphics->AttachPanelBackground(COLOR_BG);
-    pGraphics->AttachControl(view, 1);
+    g->AttachPanelBackground(COLOR_BG);
+    g->AttachControl(view);
+    IVStyle patternSwitchStyle = new IVStyle();
+    patternSwitchStyle.roundness = 0.5;
+    patternSwitchStyle.shadowOffset = 0;
+    g->AttachControl(new IVTabSwitchControl(IRECT(10, 10, 10 + 250, 10 + 25), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle));
 
-    layoutControls(pGraphics);
+    layoutControls(g);
   };
+}
+
+void GATE2::OnParamChange(int paramIdx)
+{
+  if (paramIdx == kPattern) {
+    pattern = patterns[(int)GetParam(kPattern)->Value()];
+  }
 }
 
 void GATE2::layoutControls(IGraphics* g)
 {
   const IRECT b = g->GetBounds();
   g->GetBackgroundControl()->SetTargetAndDrawRECTs(b);
-  g->GetControlWithTag(1)->SetTargetAndDrawRECTs(b.GetReducedFromTop(150));
+  view->SetTargetAndDrawRECTs(b.GetReducedFromTop(150));
 }
 
 void GATE2::OnParentWindowResize(int width, int height)

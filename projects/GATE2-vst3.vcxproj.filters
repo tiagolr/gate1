@@ -363,10 +363,10 @@
     <ClInclude Include="..\..\..\IGraphics\Extras\IGraphicsFlexBox.h">
       <Filter>IGraphics\Extras</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\GATE2.h" />
     <ClInclude Include="..\src\Pattern.h" />
     <ClInclude Include="..\src\View.h" />
+    <ClInclude Include="..\src\config.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
