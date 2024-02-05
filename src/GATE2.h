@@ -13,6 +13,7 @@ enum EParams
   kPattern = 0,
   kSync,
   kRate,
+  kPhase,
   kMin,
   kMax,
   kSmooth,
@@ -63,6 +64,7 @@ public:
   ICaptionControl* syncControl;
   Preferences* preferencesControl;
   IVKnobControl* rateControl;
+  IVKnobControl* phaseControl;
   IVKnobControl* minControl;
   IVKnobControl* maxControl;
   IVKnobControl* smoothControl;

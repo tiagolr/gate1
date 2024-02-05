@@ -261,21 +261,20 @@ void View::OnMouseDblClick(float x, float y, const IMouseMod& mod)
     points[mid].tension = 0;
   }
   if (pt == -1 && mid == -1) {
-    int px = (int)x;
-    int py = (int)y;
+    double px = (double)x;
+    double py = (double)y;
     if (isSnapping(mod)) {
-      int grid = (double)gate.gridSegs;
+      double grid = (double)gate.gridSegs;
       double gridx = double(winw) / grid;
       double gridy = double(winh) / grid;
       px = std::round(double(px - winx) / gridx) * gridx + winx;
-      py = std::round(double(px - winx) / gridy) * gridy + winy;
+      py = std::round(double(py - winy) / gridy) * gridy + winy;
     }
-    double x = double(px - winx) / winw;
-    double y = double(py - winy) / winh;
-    if (x >= 0 && x <= 1 && y >= 0 && y <= 1) { // point in env window
-      if (x == 1) x -= 0.000001; // special case avoid inserting point after last point
-      DBGMSG("POINT %i", (int)gate.GetParam(kPointMode)->Value());
-      gate.pattern->insertPoint(x, y, 0, (int)gate.GetParam(kPointMode)->Value());
+    px = double(px - winx) / (double)winw;
+    py = double(py - winy) / (double)winh;
+    if (px >= 0 && px <= 1 && py >= 0 && py <= 1) { // point in env window
+      if (px == 1) px -= 0.000001; // special case avoid inserting point after last point
+      gate.pattern->insertPoint(px, py, 0, (int)gate.GetParam(kPointMode)->Value());
     }
   }
 

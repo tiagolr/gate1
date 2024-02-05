@@ -17,6 +17,7 @@ GATE2::GATE2(const InstanceInfo& info)
   GetParam(kPattern)->InitInt("Pattern", 1, 1, 12);
   GetParam(kSync)->InitEnum("Sync", 5, 18, "", 0, "", "Rate Hz", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "1/16t", "1/8t", "1/4t", "1/2t", "1/1t", "1/16.", "1/8.", "1/4.", "1/2.", "1/1.");
   GetParam(kRate)->InitFrequency("Rate", 1., 0.01, 140);
+  GetParam(kPhase)->InitDouble("Phase", 0, 0, 1, 0.01);
   GetParam(kMin)->InitDouble("Min", 0, 0, 100, 1);
   GetParam(kMax)->InitDouble("Max", 100, 0, 100, 1);
   GetParam(kSmooth)->InitDouble("Smooth", 0, 0, 100, 1);
@@ -134,6 +135,8 @@ GATE2::GATE2(const InstanceInfo& info)
     g->AttachControl(syncControl);
     rateControl = new IVKnobControl(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(rateControl);
+    phaseControl = new IVKnobControl(IRECT(), kPhase, "Phase", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    g->AttachControl(phaseControl);
     minControl = new IVKnobControl(IRECT(), kMin, "Min", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(minControl);
     maxControl = new IVKnobControl(IRECT(), kMax, "Max", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
@@ -144,7 +147,7 @@ GATE2::GATE2(const InstanceInfo& info)
     g->AttachControl(attackControl);
     releaseControl = new IVKnobControl(IRECT(), kRelease, "Release", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(releaseControl);
-    tensionControl = new IVKnobControl(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    tensionControl = new IVKnobControl(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(tensionControl);
     pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
     g->AttachControl(pointModeControl);
@@ -193,6 +196,8 @@ void GATE2::layoutControls(IGraphics* g)
     rateControl->SetTargetAndDrawRECTs(IRECT(drawx,drawy,drawx+80,drawy+80));
     drawx += 70;
   }
+  phaseControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+80));
+  drawx += 70;
   minControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+80));
   drawx += 70;
   maxControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+80));

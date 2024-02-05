@@ -35,7 +35,7 @@ void Preferences::showPopupMenu()
   menu->AddItem("Load")->SetSubmenu(loadMenu);
   menu->AddItem("About");
   
-  GetUI()->CreatePopupMenu(*this, *menu, GetWidgetBounds().GetHShifted(-110));
+  GetUI()->CreatePopupMenu(*this, *menu, GetWidgetBounds());
 }
 
 void Preferences::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) {
