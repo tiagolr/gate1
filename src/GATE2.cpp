@@ -3,6 +3,7 @@
 #include "IControls.h"
 #include "Test/TestSizeControl.h"
 #include "View.h"
+#include "Preferences.h"
 
 const IColor GATE2::COLOR_BG = IColor::FromColorCode(0x181614);
 const IColor GATE2::COLOR_ACTIVE = IColor::FromColorCode(0xFF8050);
@@ -154,10 +155,10 @@ GATE2::GATE2(const InstanceInfo& info)
     t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
     gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
     g->AttachControl(gridNumber);
-    optionsControl = new OptionsControl(IRECT(), [&](IControl* pCaller) {
-      optionsControl->showPopupMenu();
+    preferencesControl = new Preferences(IRECT(), [&](IControl* pCaller) {
+      preferencesControl->showPopupMenu();
     }, ". . .", numberStyle, *this);
-    g->AttachControl(optionsControl);
+    g->AttachControl(preferencesControl);
 
     inited = true;
     layoutControls(g);
@@ -182,7 +183,7 @@ void GATE2::layoutControls(IGraphics* g)
 
   // first row right
   drawx = b.R - 50;
-  optionsControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy+10, drawx+40, drawy+25+10));
+  preferencesControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy+10, drawx+40, drawy+25+10));
 
   // second row left
   drawy = 50;
