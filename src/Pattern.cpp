@@ -141,7 +141,123 @@ double Pattern::get_y_curve(Segment seg, double x)
         return std::pow((x - seg.x1) / (seg.x2 - seg.x1), pwr) * (seg.y2 - seg.y1) + seg.y1;
 
     return -1 * (std::pow(1 - (x - seg.x1) / (seg.x2 - seg.x1), pwr) - 1) * (seg.y2 - seg.y1) + seg.y1;
-};
+}
+
+
+double Pattern::get_y_scurve(Segment seg, double x)
+{
+  auto rise = seg.y1 > seg.y2;
+  auto tmult = gate.tensionMult;
+  auto ten = seg.tension + (rise ? -tmult / 100 : tmult / 100);
+  if (ten > 1) ten = 1;
+  if (ten < -1) ten = -1;
+  auto pwr = pow(1.1, std::fabs(ten * 50));
+
+  double xx = (seg.x2 + seg.x1) / 2;
+  double yy = (seg.y2 + seg.y1) / 2;
+
+  if (seg.x1 == seg.x2)
+    return seg.y2;
+
+  if (x < xx && ten >=0)
+    return std::pow((x - seg.x1) / (xx - seg.x1), pwr) * (yy - seg.y1) + seg.y1; 
+    
+  if (x < xx && ten < 0)
+    return -1 * (std::pow(1 - (x - seg.x1) / (xx - seg.x1), pwr) - 1) * (yy - seg.y1) + seg.y1;
+
+  if (x >= xx && ten >= 0)
+    return -1 * (std::pow(1 - (x - xx) / (seg.x2 - xx), pwr) - 1) * (seg.y2 - yy) + yy;
+
+   return std::pow((x - xx) / (seg.x2 - xx), pwr) * (seg.y2 - yy) + yy;
+}
+
+double Pattern::get_y_pulse(Segment seg, double x)
+{
+  double t = std::max(std::floor(std::pow(seg.tension,2) * 100), 1.0); // num waves
+
+  if (x == seg.x2)
+    return seg.y2; 
+    
+  double cycle_width = (seg.x2 - seg.x1) / t;
+  double x_in_cycle = mod((x - seg.x1), cycle_width);
+  return x_in_cycle < cycle_width / 2
+    ? (seg.tension >= 0 ? seg.y1 : seg.y2)
+    : (seg.tension >= 0 ? seg.y2 : seg.y1);
+}
+
+double Pattern::get_y_wave(Segment seg, double x)
+{
+  double t = 2 * std::floor(std::fabs(std::pow(seg.tension,2) * 100) + 1) - 1; // wave num
+  double amp = (seg.y2 - seg.y1) / 2;
+  double vshift = seg.y1 + amp;
+  double freq = t * 2 * PI / (2 * (seg.x2 - seg.x1));
+  return -amp * cos(freq * (x - seg.x1)) + vshift;
+}
+
+double Pattern::get_y_triangle(Segment seg, double x)
+{
+  double tt = 2 * std::floor(std::fabs(std::pow(seg.tension,2) * 100) + 1) - 1.0;// wave num
+  double amp = seg.y2 - seg.y1;
+  double t = (seg.x2 - seg.x1) * 2 / tt;
+  return amp * (2 * std::fabs((x - seg.x1) / t - std::floor(1./2. + (x - seg.x1) / t))) + seg.y1;
+}
+
+double Pattern::get_y_stairs(Segment seg, double x)
+{
+  double t = std::max(std::floor(std::pow(seg.tension,2) * 150), 2.); // num waves
+  double step_size = 0.;
+  double step_index = 0.;
+  double y_step_size = 0.;
+
+  if (seg.tension >= 0) {
+    step_size = (seg.x2 - seg.x1) / t;
+    step_index = std::floor((x - seg.x1) / step_size);
+    y_step_size = (seg.y2 - seg.y1) / (t-1);
+  }
+  else {
+    step_size = (seg.x2 - seg.x1) / (t-1);
+    step_index = ceil((x - seg.x1) / step_size);
+    y_step_size = (seg.y2 - seg.y1) / t;
+  }
+
+  if (x == seg.x2)
+    return seg.y2;
+  
+  return seg.y1 + step_index * y_step_size;
+}
+
+double Pattern::get_y_smooth_stairs(Segment seg, double x)
+{
+  double pwr = 4;
+  double t = std::max(floor(std::pow(seg.tension,2) * 150), 1.0); // num waves
+
+  double gx = (seg.x2 - seg.x1) / t; // gridx
+  double gy = (seg.y2 - seg.y1) / t; // gridy
+  double step_index = std::floor((x - seg.x1) / gx);
+
+  double xx1 = seg.x1 + gx * step_index;
+  double xx2 = seg.x1 + gx * (step_index + 1);
+  double xx = (xx1 + xx2) / 2;
+
+  double yy1 = seg.y1 + gy * step_index;
+  double yy2 = seg.y1 + gy * (step_index + 1);
+  double yy = (yy1 + yy2) / 2;
+
+  if (seg.x1 == seg.x2)
+    return seg.y2;
+
+  if (x < xx && seg.tension >= 0)
+    return std::pow((x - xx1) / (xx - xx1), pwr) * (yy - yy1) + yy1;
+
+  if (x < xx && seg.tension < 0)
+    return -1 * (std::pow(1 - (x - xx1) / (xx - xx1), pwr) - 1) * (yy - yy1) + yy1;
+
+  if (x >= xx && seg.tension >= 0)
+    return -1 * (std::pow(1 - (x - xx) / (xx2 - xx), pwr) - 1) * (yy2 - yy) + yy;
+
+  return std::pow((x - xx) / (xx2 - xx), pwr) * (yy2 - yy) + yy;
+}
+
 
 double Pattern::get_y_at(double x)
 {
@@ -149,8 +265,24 @@ double Pattern::get_y_at(double x)
         if (seg->x1 <= x && seg->x2 >= x) {
             if (seg->type == 0) return seg->y1; // hold
             if (seg->type == 1) return get_y_curve(*seg, x);
+            if (seg->type == 2) return get_y_scurve(*seg, x);
+            if (seg->type == 3) return get_y_pulse(*seg, x);
+            if (seg->type == 4) return get_y_wave(*seg, x);
+            if (seg->type == 5) return get_y_triangle(*seg, x);
+            if (seg->type == 6) return get_y_stairs(*seg, x);
+            if (seg->type == 7) return get_y_smooth_stairs(*seg, x);
         }
     }
 
     return -1;
+}
+
+/*
+Modulus that works with fractional numbers
+*/
+double Pattern::mod(double a, double b)
+{
+  while( a >= b )
+    a -= b;
+  return a;
 }

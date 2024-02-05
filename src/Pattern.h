@@ -32,6 +32,7 @@ struct Segment {
 class Pattern
 {
 public:
+    static const int PI = 3.14159265358979323846;
     int index;
     std::vector<Point> points;
     std::vector<Segment> segments;
@@ -50,8 +51,15 @@ public:
     void loadRandom(int grid);
 
     double get_y_curve(Segment seg, double x);
+    double get_y_scurve(Segment seg, double x);
+    double get_y_pulse(Segment seg, double x);
+    double get_y_wave(Segment seg, double x);
+    double get_y_triangle(Segment seg, double x);
+    double get_y_stairs(Segment seg, double x);
+    double get_y_smooth_stairs(Segment seg, double x);
     double get_y_at(double x);
 
 private:
     GATE2& gate;
+    double mod(double a, double b);
 };
