@@ -4,7 +4,7 @@
 #include "Test/TestSizeControl.h"
 #include "View.h"
 
-const IColor GATE2::COLOR_BG = IColor::FromColorCode(0x141618);
+const IColor GATE2::COLOR_BG = IColor::FromColorCode(0x181614);
 const IColor GATE2::COLOR_ACTIVE = IColor::FromColorCode(0xFF8050);
 const IColor GATE2::COLOR_ACTIVE_LIGHT = IColor::FromColorCode(0xffb193);
 const IColor GATE2::COLOR_ACTIVE_DARK = IColor::FromColorCode(0x88442b);
@@ -14,7 +14,7 @@ GATE2::GATE2(const InstanceInfo& info)
 {
   // init params
   GetParam(kPattern)->InitInt("Pattern", 1, 1, 12);
-  GetParam(kSync)->InitEnum("Sync", 5, 18, "", 0, "", "Off", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "1/16t", "1/8t", "1/4t", "1/2t", "1/1t", "1/16.", "1/8.", "1/4.", "1/2.", "1/1.");
+  GetParam(kSync)->InitEnum("Sync", 5, 18, "", 0, "", "Rate Hz", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "1/16t", "1/8t", "1/4t", "1/2t", "1/1t", "1/16.", "1/8.", "1/4.", "1/2.", "1/1.");
   GetParam(kRate)->InitFrequency("Rate", 1., 0.01, 140);
   GetParam(kMin)->InitDouble("Min", 0, 0, 100, 1);
   GetParam(kMax)->InitDouble("Max", 100, 0, 100, 1);
@@ -104,6 +104,19 @@ GATE2::GATE2(const InstanceInfo& info)
     buttonStyle.valueText.mSize = 16;
     buttonStyle.valueText = buttonStyle.valueText.WithFont("Roboto-Bold");
 
+    IVColorSpec numberColors = {
+      COLOR_BG,
+      COLOR_BG,
+      COLOR_BG,
+      COLOR_BG,
+      COLOR_TRANSPARENT,
+    };
+    IVStyle numberStyle = (new IVStyle())->WithColors(numberColors);
+    numberStyle.roundness = 0.5;
+    numberStyle.valueText.mFGColor = COLOR_ACTIVE;
+    numberStyle.valueText.mSize = 16;
+    numberStyle.valueText = numberStyle.valueText.WithFont("Roboto-Bold");
+
     //Create controls
     IRECT rect;
     view = new View(rect, *this);
@@ -135,6 +148,9 @@ GATE2::GATE2(const InstanceInfo& info)
     g->AttachControl(paintModeControl);
     snapControl = new IVToggleControl(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
     g->AttachControl(snapControl);
+    t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
+    gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
+    g->AttachControl(gridNumber);
 
     inited = true;
     layoutControls(g);
@@ -143,6 +159,9 @@ GATE2::GATE2(const InstanceInfo& info)
 
 void GATE2::layoutControls(IGraphics* g)
 {
+  if (!inited)
+    return;
+
   const IRECT b = g->GetBounds();
   g->GetBackgroundControl()->SetTargetAndDrawRECTs(b);
   view->SetTargetAndDrawRECTs(b.GetReducedFromTop(165));
@@ -194,15 +213,14 @@ void GATE2::layoutControls(IGraphics* g)
   pointModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
 
   // third row right
-  drawx = b.R - 70;
+  drawx = b.R - 73;
   snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+70, drawy+30));
+  drawx -= 80;
+  gridNumber->SetTargetAndDrawRECTs(IRECT(drawx+30, drawy+3, drawx+40+40, drawy+20+3));
 }
 
 void GATE2::OnParamChange(int paramIdx)
 {
-  if (!inited)
-    return;
-
   if (paramIdx == kPattern) {
     pattern = patterns[(int)GetParam(kPattern)->Value() - 1];
   }
@@ -211,6 +229,9 @@ void GATE2::OnParamChange(int paramIdx)
   }
   else if (paramIdx == kGrid) {
     gridSegs = (int)GetParam(kGrid)->Value();
+  }
+  else if (paramIdx == kTension) {
+    tensionMult = GetParam(kTension)->Value();
   }
 }
 

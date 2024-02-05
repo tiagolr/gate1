@@ -46,6 +46,7 @@ public:
   int gridSegs = 8;
   bool linkEdgePoints = false;
   bool dualSmooth = true;
+  double tensionMult = 0;
 
   static const IColor COLOR_BG;
   static const IColor COLOR_ACTIVE;
@@ -67,6 +68,7 @@ public:
   ICaptionControl* pointModeControl;
   ICaptionControl* paintModeControl;
   IVToggleControl* snapControl;
+  IVNumberBoxControl* gridNumber;
 
   GATE2(const InstanceInfo& info);
 
