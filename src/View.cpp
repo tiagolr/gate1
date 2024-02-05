@@ -298,3 +298,8 @@ bool View::pointInRect(int x, int y, int xx, int yy, int w, int h)
 {
   return x >= xx && x <= xx + w && y >= yy && y <= yy + h;
 };
+
+void View::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx)
+{
+  DBGMSG("GOT RES %s", pSelectedMenu->GetRootTitle());
+}

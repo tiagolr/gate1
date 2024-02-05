@@ -58,6 +58,7 @@ public:
   View* view;
   IVTabSwitchControl* patternSwitches;
   ICaptionControl* syncControl;
+  IVButtonControl* optionsControl;
   IVKnobControl* rateControl;
   IVKnobControl* minControl;
   IVKnobControl* maxControl;
@@ -80,8 +81,9 @@ public:
   void ProcessMidiMsg(const IMidiMsg& msg) override;
   void OnIdle() override;
   void OnParamChange(int paramIdx) override;
-
   void layoutControls(IGraphics* g);
+
+  void onClickOptions();
 
 private:
   FastSinOscillator<sample> mOsc {440.f};

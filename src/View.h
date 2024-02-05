@@ -47,6 +47,8 @@ public:
   void OnMouseUp(float x, float y, const IMouseMod& mod) override;
   void OnMouseDblClick(float x, float y, const IMouseMod& mod) override;
 
+  void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override;
+
 private:
   GATE2& gate;
   double origTension = 0;

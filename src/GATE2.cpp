@@ -116,6 +116,9 @@ GATE2::GATE2(const InstanceInfo& info)
     numberStyle.valueText.mFGColor = COLOR_ACTIVE;
     numberStyle.valueText.mSize = 16;
     numberStyle.valueText = numberStyle.valueText.WithFont("Roboto-Bold");
+    numberStyle.labelText.mFGColor = COLOR_ACTIVE;
+    numberStyle.labelText.mSize = 16;
+    numberStyle.labelText = numberStyle.labelText.WithFont("Roboto-Bold");
 
     //Create controls
     IRECT rect;
@@ -151,10 +154,24 @@ GATE2::GATE2(const InstanceInfo& info)
     t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
     gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
     g->AttachControl(gridNumber);
+    optionsControl = new IVButtonControl(IRECT(), [&](IControl* pCaller) {
+      onClickOptions();
+    }, ". . .", numberStyle);
+    g->AttachControl(optionsControl);
 
     inited = true;
     layoutControls(g);
   };
+}
+
+void GATE2::onClickOptions()
+{
+  IPopupMenu menu;
+  menu.SetRootTitle("TITLE");
+  menu.AddItem("Item 1");
+  menu.AddItem("Item 2");
+  menu.AddItem("Item 3");
+  GetUI()->CreatePopupMenu(*view, menu, IRECT(200,200,240,210));
 }
 
 void GATE2::layoutControls(IGraphics* g)
@@ -174,9 +191,8 @@ void GATE2::layoutControls(IGraphics* g)
   patternSwitches->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 250, drawy + 25));
 
   // first row right
-  drawx = b.R;
-  drawx -= 50;
-  // draw options btn
+  drawx = b.R - 50;
+  optionsControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy+10, drawx+40, drawy+25+10));
 
   // second row left
   drawy = 50;
