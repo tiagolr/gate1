@@ -154,24 +154,14 @@ GATE2::GATE2(const InstanceInfo& info)
     t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
     gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
     g->AttachControl(gridNumber);
-    optionsControl = new IVButtonControl(IRECT(), [&](IControl* pCaller) {
-      onClickOptions();
-    }, ". . .", numberStyle);
+    optionsControl = new OptionsControl(IRECT(), [&](IControl* pCaller) {
+      optionsControl->showPopupMenu();
+    }, ". . .", numberStyle, *this);
     g->AttachControl(optionsControl);
 
     inited = true;
     layoutControls(g);
   };
-}
-
-void GATE2::onClickOptions()
-{
-  IPopupMenu menu;
-  menu.SetRootTitle("TITLE");
-  menu.AddItem("Item 1");
-  menu.AddItem("Item 2");
-  menu.AddItem("Item 3");
-  GetUI()->CreatePopupMenu(*view, menu, IRECT(200,200,240,210));
 }
 
 void GATE2::layoutControls(IGraphics* g)

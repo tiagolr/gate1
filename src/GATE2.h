@@ -38,6 +38,41 @@ class View;
 using namespace iplug;
 using namespace igraphics;
 
+class OptionsControl : public IVButtonControl
+{
+public:
+  OptionsControl(const IRECT& bounds, IActionFunction aF, const char* label, const IVStyle& style, GATE2& g)
+    : IVButtonControl(bounds, aF, label, style), gate(g) {};
+
+  ~OptionsControl() {
+    DBGMSG("DESTROYED");
+  }
+
+  void showPopupMenu()
+  {
+    IPopupMenu menu;
+    IPopupMenu* submenu = new IPopupMenu("Root");
+    submenu->AddItem("Test 1");
+    submenu->AddItem("Test 2");
+    menu.AddItem("Item 1");
+    menu.AddItem("Item 2");
+    auto m = menu.AddItem("Item 3");
+    m->SetSubmenu(submenu);
+
+    GetUI()->CreatePopupMenu(*this, menu, IRECT(200,200,210,210));
+  }
+
+  void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override {
+    if (pSelectedMenu == nullptr)
+      return;
+
+    DBGMSG("OKAY %s", pSelectedMenu->GetChosenItem()->GetText());
+  }
+
+private:
+  GATE2& gate;
+};
+
 class GATE2 final : public Plugin
 {
 public:
@@ -58,7 +93,7 @@ public:
   View* view;
   IVTabSwitchControl* patternSwitches;
   ICaptionControl* syncControl;
-  IVButtonControl* optionsControl;
+  OptionsControl* optionsControl;
   IVKnobControl* rateControl;
   IVKnobControl* minControl;
   IVKnobControl* maxControl;
@@ -89,3 +124,4 @@ private:
   FastSinOscillator<sample> mOsc {440.f};
   IBufferSender<> mScopeSender;
 };
+
