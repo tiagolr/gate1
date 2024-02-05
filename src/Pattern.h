@@ -32,7 +32,7 @@ struct Segment {
 class Pattern
 {
 public:
-    static const int PI = 3.14159265358979323846;
+    const double PI = 3.14159265358979323846;
     int index;
     std::vector<Point> points;
     std::vector<Segment> segments;

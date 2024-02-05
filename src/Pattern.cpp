@@ -278,7 +278,7 @@ double Pattern::get_y_at(double x)
 }
 
 /*
-Modulus that works with fractional numbers
+  Modulus that works with fractional numbers
 */
 double Pattern::mod(double a, double b)
 {

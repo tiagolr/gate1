@@ -173,6 +173,12 @@ void View::OnMouseDown(float x, float y, const IMouseMod& mod)
       }
     }
   }
+  else if (mod.R) {
+    rmousePoint = getHoveredPoint((int)x, (int)y);
+    if (rmousePoint > -1) {
+      showRightMouseMenu((int)x, (int)y);
+    }
+  }
 }
 
 void View::OnMouseUp(float x, float y, const IMouseMod& mod)
@@ -281,6 +287,30 @@ void View::OnMouseDblClick(float x, float y, const IMouseMod& mod)
   gate.pattern->buildSegments();
 }
 
+void View::showRightMouseMenu(int x, int y)
+{
+  IPopupMenu* menu = new IPopupMenu();
+  menu->AddItem("Hold");
+  menu->AddItem("Curve");
+  menu->AddItem("S-Curve");
+  menu->AddItem("Pulse");
+  menu->AddItem("Wave");
+  menu->AddItem("Triangle");
+  menu->AddItem("Stairs");
+  menu->AddItem("Smooth stairs");
+
+  GetUI()->CreatePopupMenu(*this, *menu, IRECT(x,y,x,y));
+}
+
+void View::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx)
+{
+  if (pSelectedMenu == nullptr)
+    return;
+
+  gate.pattern->points[rmousePoint].type = pSelectedMenu->GetChosenItemIdx();
+  gate.pattern->buildSegments();
+}
+
 // ==================================================
 
 bool View::isSnapping(const IMouseMod& mod) {
@@ -297,8 +327,3 @@ bool View::pointInRect(int x, int y, int xx, int yy, int w, int h)
 {
   return x >= xx && x <= xx + w && y >= yy && y <= yy + h;
 };
-
-void View::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx)
-{
-  DBGMSG("GOT RES %s", pSelectedMenu->GetRootTitle());
-}

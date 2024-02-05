@@ -25,6 +25,7 @@ public:
   int selectedMidpoint = -1;
   int hoverPoint = -1;
   int hoverMidpoint = -1;
+  int rmousePoint = -1;
   const int HOVER_RADIUS = 8;
 
   View(const IRECT&, GATE2&);
@@ -47,6 +48,7 @@ public:
   void OnMouseUp(float x, float y, const IMouseMod& mod) override;
   void OnMouseDblClick(float x, float y, const IMouseMod& mod) override;
 
+  void showRightMouseMenu(int x, int y);
   void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override;
 
 private:
