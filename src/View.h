@@ -38,6 +38,7 @@ public:
   void drawSegments(IGraphics& g);
   void drawMidPoints(IGraphics& g);
   void drawPoints(IGraphics& g);
+  void drawSeek(IGraphics& g);
   std::vector<double> View::getMidpointXY(Segment seg);
   int getHoveredPoint(int x, int y);
   int getHoveredMidpoint(int x, int y);

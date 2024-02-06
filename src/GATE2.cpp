@@ -9,6 +9,8 @@ const IColor GATE2::COLOR_BG = IColor::FromColorCode(0x181614);
 const IColor GATE2::COLOR_ACTIVE = IColor::FromColorCode(0xFF8050);
 const IColor GATE2::COLOR_ACTIVE_LIGHT = IColor::FromColorCode(0xffb193);
 const IColor GATE2::COLOR_ACTIVE_DARK = IColor::FromColorCode(0x88442b);
+const IColor GATE2::COLOR_SEEK = IColor::FromColorCode(0x80FFFF, 0x80);
+const IColor GATE2::COLOR_SEEK_CIRCLE = IColor::FromColorCode(0x80FFFF);
 
 GATE2::GATE2(const InstanceInfo& info)
 : Plugin(info, MakeConfig(kNumParams, kNumPresets))
@@ -308,7 +310,7 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   const double srate = GetSampleRate();
   const double tempo = GetTempo();
   const double beatsPerSpl = tempo / (60. * srate);
-  const bool isPlaying = GetTransportIsRunning();
+  isPlaying = GetTransportIsRunning();
   const double sync = GetParam(kSync)->Value();
   const double phase = GetParam(kPhase)->Value();
   const double ratehz = GetParam(kRate)->Value();

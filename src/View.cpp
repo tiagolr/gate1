@@ -27,6 +27,7 @@ void View::Draw(IGraphics& g) {
   drawSegments(g);
   drawMidPoints(g);
   drawPoints(g);
+  drawSeek(g);
 }
 
 void View::drawGrid(IGraphics& g)
@@ -127,6 +128,15 @@ void View::drawMidPoints(IGraphics& g)
     auto seg = segs[selectedMidpoint];
     auto xy = getMidpointXY(seg);
     g.FillCircle(GATE2::COLOR_ACTIVE, xy[0], xy[1], 3);
+  }
+}
+
+void View::drawSeek(IGraphics& g)
+{
+  // (mode == 0 && play_state & 1) || always_playing || (mode == 2 && midi_trigger)
+  if (gate.isPlaying || gate.alwaysPlaying) {
+    g.DrawLine(GATE2::COLOR_SEEK, gate.xpos * winw + winx, winy, gate.xpos * winw + winx, winy + winh);
+    g.DrawCircle(GATE2::COLOR_SEEK_CIRCLE, gate.xpos * winw + winx, (1 - gate.ypos) * winh + winy, 5);
   }
 }
 

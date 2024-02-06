@@ -52,6 +52,7 @@ public:
   int triggerChannel = 10;
   bool drawWave = true;
   double syncQN = 0;
+  bool isPlaying = false;
   bool alwaysPlaying = false;
   double xpos = 0;
   double ypos = 0;
@@ -60,6 +61,8 @@ public:
   static const IColor COLOR_ACTIVE;
   static const IColor COLOR_ACTIVE_DARK;
   static const IColor COLOR_ACTIVE_LIGHT;
+  static const IColor COLOR_SEEK;
+  static const IColor COLOR_SEEK_CIRCLE;
 
   Pattern* pattern;
   Pattern* patterns[12];
