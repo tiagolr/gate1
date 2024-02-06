@@ -339,8 +339,10 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   const double sync = GetParam(kSync)->Value();
   const double phase = GetParam(kPhase)->Value();
   const double ratehz = GetParam(kRate)->Value();
-  if (isPlaying)
+  // update beatpos only in tempo sync mode during playback
+  if (!midiMode && isPlaying && sync > 0) {
     beatPos = GetPPQPos();
+  }
   const double lfomin = GetParam(kMin)->Value() / 100;
   const double lfomax = GetParam(kMax)->Value() / 100;
   double nextValue;
@@ -457,14 +459,16 @@ void GATE2::OnReset()
   double min = GetParam(kMin)->Value() / 100;
   double max = GetParam(kMax)->Value() / 100;
 
+  // reset value.smooth on play
   if (sync) {
     double x = GetPPQPos() / syncQN + phase;
     x -= std::floor(x);
-    value->smooth = getY(x, min, max); // reset value.smooth on play
+    value->smooth = getY(x, min, max); 
   }
 
+  // reset beatPos on play in Hz mode
   if (!midiMode && !sync) {
-    beatPos = 0; // reset beatPos on play in Hz mode
+    beatPos = 0; 
   }
 }
 
