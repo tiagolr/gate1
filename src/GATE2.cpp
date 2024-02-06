@@ -30,8 +30,9 @@ GATE2::GATE2(const InstanceInfo& info)
   GetParam(kSnap)->InitBool("Snap", 0);
   GetParam(kGrid)->InitInt("Grid", 8, 2, 32);
   GetParam(kRetrigger)->InitBool("Retrigger", 0);
-  preSamples.resize(PLUG_MAX_WIDTH);
-  postSamples.resize(PLUG_MAX_WIDTH);
+
+  preSamples.resize(PLUG_MAX_WIDTH, 0);
+  postSamples.resize(PLUG_MAX_WIDTH, 0);
 
   // init patterns
   for (int i = 0; i < 12; i++) {
@@ -154,6 +155,20 @@ GATE2::GATE2(const InstanceInfo& info)
     g->AttachControl(pointModeControl);
     paintModeControl = new ICaptionControl(IRECT(), kPaintMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
     g->AttachControl(paintModeControl);
+    playControl = new PlayButton(IRECT(), [&](IControl* pCaller){
+      alwaysPlaying = !alwaysPlaying;
+      playControl->SetValue(alwaysPlaying ? 1 : 0);
+      playControl->SetDirty(false);
+    });
+    playControl->SetValue(alwaysPlaying ? 1 : 0);
+    g->AttachControl(playControl);
+    midiModeControl = new IVToggleControl(IRECT(), [&](IControl* pCaller) {
+      midiMode = !midiMode;
+      midiModeControl->SetValue(midiMode ? 1 : 0);
+      midiModeControl->SetDirty(false);
+    }, "", buttonStyle, "MIDI", "MIDI");
+    midiModeControl->SetValue(midiMode ? 1 : 0);
+    g->AttachControl(midiModeControl);
     snapControl = new IVToggleControl(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
     g->AttachControl(snapControl);
     t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
@@ -224,9 +239,13 @@ void GATE2::layoutControls(IGraphics* g)
   paintModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
   drawx += 90;
   pointModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
+  drawx += 90;
+  playControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20 , drawy+20));
 
   // third row right
   drawx = b.R - 73;
+  midiModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 70, drawy + 30));
+  drawx -= 65;
   snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+70, drawy+30));
   drawx -= 80;
   gridNumber->SetTargetAndDrawRECTs(IRECT(drawx+30, drawy+3, drawx+40+40, drawy+20+3));
@@ -265,6 +284,9 @@ void GATE2::OnParamChange(int paramIdx)
   else if (paramIdx == kTension) {
     tensionMult = GetParam(kTension)->Value();
   }
+  else if (paramIdx == kRetrigger && GetParam(kRetrigger)->Value() == 1) {
+    midiTrigger = true;
+  }
 }
 
 void GATE2::OnParentWindowResize(int width, int height)
@@ -299,9 +321,31 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   const double sync = GetParam(kSync)->Value();
   const double phase = GetParam(kPhase)->Value();
   const double ratehz = GetParam(kRate)->Value();
-  double beatPos = GetPPQPos();
+  if (isPlaying)
+    beatPos = GetPPQPos();
   const double lfomin = GetParam(kMin)->Value() / 100;
   const double lfomax = GetParam(kMax)->Value() / 100;
+
+  auto processDisplaySamples = [&](int s) {
+    winpos = std::floor(xpos * view->winw);
+    if (lwinpos != winpos) {
+      preSamples[winpos] = 0;
+      postSamples[winpos] = 0;
+    }
+    lwinpos = winpos;
+    double avgPreSample = 0;
+    double avgPostSample = 0;
+    for (int c = 0; c < nChans; ++c) {
+      avgPreSample += inputs[c][s];
+      avgPostSample += outputs[c][s];
+    }
+    avgPreSample = std::abs(avgPreSample / nChans);
+    avgPostSample = std::abs(avgPostSample / nChans);
+    if (preSamples[winpos] < avgPreSample)
+      preSamples[winpos] = avgPreSample;
+    if (postSamples[winpos] < avgPostSample)
+      postSamples[winpos] = avgPostSample;
+  };
 
   // reset play position for Hz sync mode
   //mode == 0 && !sync && (play_state & 1) && (!lplay_state & 1) ? (
@@ -310,9 +354,9 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 
   //mode == 0 && always_playing && !(play_state & 1) && retrigger && !lretrigger ? (
   //  retrigger_lfo();
-  //);
+  //);  
 
-  if (isPlaying) {
+  if (!midiMode && (isPlaying || alwaysPlaying)) {
     for (int s = 0; s < nFrames; ++s) {
       if (sync > 0) {
         beatPos += beatsPerSpl;
@@ -329,45 +373,70 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
         outputs[c][s] = inputs[c][s] * ypos;
       }
 
-      winpos = std::floor(xpos * view->winw);
-      if (lwinpos != winpos) {
-        preSamples[winpos] = 0;
-        postSamples[winpos] = 0;
+      processDisplaySamples(s);
+    }
+  }
+
+  else if (midiMode && (alwaysPlaying || midiTrigger)) {
+    if (alwaysPlaying && midiTrigger) { // reset phase on midiTrigger
+      xpos = phase;
+      midiTrigger = false;
+    }
+    for (int s = 0; s < nFrames; ++s) {
+      xpos += sync > 0
+        ? beatsPerSpl / syncQN
+        : 1 / srate * ratehz;
+      if (!alwaysPlaying && xpos >= 1) {
+        midiTrigger = false;
+        xpos = 1;
       }
-      lwinpos = winpos;
-      double avgPreSample = 0;
-      double avgPostSample = 0;
+      else {
+        xpos -= std::floor(xpos);
+      }
+      ypos = getY(xpos, lfomin, lfomax);
       for (int c = 0; c < nChans; ++c) {
-        avgPreSample += inputs[c][s];
-        avgPostSample += outputs[c][s];
+        outputs[c][s] = inputs[c][s] * ypos;
       }
-      avgPreSample = std::abs(avgPreSample / nChans);
-      avgPostSample = std::abs(avgPostSample / nChans);
-      if (preSamples[winpos] < avgPreSample)
-        preSamples[winpos] = avgPreSample;
-      if (postSamples[winpos] < avgPostSample)
-        postSamples[winpos] = avgPostSample;
+      processDisplaySamples(s);
+    }
+  }
+  // keep processing the same position if stopped in MIDI mode
+  else if (midiMode && !alwaysPlaying && !midiTrigger) {
+    for (int s = 0; s < nFrames; ++s) {
+      ypos = getY(xpos, lfomin, lfomax);
+      for (int c = 0; c < nChans; ++c) {
+        outputs[c][s] = inputs[c][s] * ypos;
+      }
     }
   }
 }
 
 void GATE2::ProcessMidiMsg(const IMidiMsg& msg)
 {
-
   int status = msg.StatusMsg();
+  int channel = msg.Channel();
+  int vel = msg.Velocity();
 
-  auto midi2CPS = [](int pitch) {
-    return 440. * pow(2., (pitch - 69.) / 12.);
-  };
-
-  if (status == IMidiMsg::kNoteOn) {
-    mOsc.SetFreqCPS(midi2CPS(msg.NoteNumber()));     
+  if (status == IMidiMsg::kNoteOn && vel > 0 && (channel == triggerChannel - 1 || triggerChannel == 17)) {
+    GetParam(kPattern)->Set(msg.NoteNumber() % 12 + 1);
+    SendCurrentParamValuesFromDelegate();
+    DirtyParametersFromUI();
   }
-
+  else if (midiMode && status == IMidiMsg::kNoteOn && vel > 0) {
+    midiTrigger = true;
+    xpos = GetParam(kPhase)->Value();
+  }
   SendMidiMsg(msg); // passthrough
+}
+
+void GATE2::OnReset()
+{
+  preSamples.clear();
+  preSamples.resize(PLUG_MAX_WIDTH, 0);
+  postSamples.clear();
+  postSamples.resize(PLUG_MAX_WIDTH, 0);
 }
 
 void GATE2::OnIdle()
 {
-  mScopeSender.TransmitData(*this);
 }

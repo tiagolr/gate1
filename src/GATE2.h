@@ -36,6 +36,7 @@ enum EControlTags
 
 class View;
 class Preferences;
+class PlayButton;
 
 using namespace iplug;
 using namespace igraphics;
@@ -49,15 +50,18 @@ public:
   int triggerChannel = 10;
   bool drawWave = true;
   bool alwaysPlaying = false;
+  bool midiMode = false;
   // state
   bool inited = false;
   bool isPlaying = false;
   bool snap = false;
+  bool midiTrigger = false; // trigger via midi or slider is active
   int gridSegs = 8;
   double tensionMult = 0;
   double syncQN = 0;
   double xpos = 0;
   double ypos = 0;
+  double beatPos = 0;
   int winpos = 0;
   int lwinpos = 0;
   std::vector<sample> preSamples;
@@ -85,8 +89,10 @@ public:
   IVKnobControl* tensionControl;
   ICaptionControl* pointModeControl;
   ICaptionControl* paintModeControl;
+  PlayButton* playControl;
   IVToggleControl* snapControl;
   IVNumberBoxControl* gridNumber;
+  IVToggleControl* midiModeControl;
 
   GATE2(const InstanceInfo& info);
 
@@ -98,13 +104,8 @@ public:
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
   void ProcessMidiMsg(const IMidiMsg& msg) override;
   void OnIdle() override;
+  void OnReset() override;
   void OnParamChange(int paramIdx) override;
   void layoutControls(IGraphics* g);
-
-  void onClickOptions();
-
-private:
-  FastSinOscillator<sample> mOsc {440.f};
-  IBufferSender<> mScopeSender;
 };
 

@@ -32,7 +32,7 @@ void View::Draw(IGraphics& g) {
   drawMidPoints(g);
   drawPoints(g);
   // (mode == 0 && play_state & 1) || always_playing || (mode == 2 && midi_trigger)
-  if (gate.isPlaying || gate.alwaysPlaying) {
+  if ((!gate.midiMode && gate.isPlaying) || gate.alwaysPlaying || (gate.midiMode && gate.midiTrigger)) {
     drawSeek(g);
   }
 }

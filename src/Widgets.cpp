@@ -1,6 +1,22 @@
 #include "Widgets.h"
 #include <string>
 
+void PlayButton::Draw(IGraphics& g)
+{
+  IRECT r = mRECT.GetPadded(-2);
+  if (GetValue() > 0.5) {
+    g.FillRect(GATE2::COLOR_ACTIVE, r);
+  }
+  else {
+    g.FillTriangle(GATE2::COLOR_ACTIVE, r.L, r.T, r.R, (r.T + r.B) / 2, r.L, r.B);
+  }
+}
+
+void PlayButton::OnMouseDown(float x, float y, const IMouseMod& mod)
+{
+  SetDirty(true);
+}
+
 void Preferences::showPopupMenu()
 {
   IPopupMenu* menu = new IPopupMenu();

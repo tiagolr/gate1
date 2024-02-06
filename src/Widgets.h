@@ -2,6 +2,14 @@
 #include "GATE2.h"
 #include "IControls.h"
 
+class PlayButton : public IControl
+{
+public:
+  PlayButton(const IRECT& bounds, IActionFunction af) : IControl(bounds, af) {};
+  void OnMouseDown(float x, float y, const IMouseMod& mod) override;
+  void Draw(IGraphics& g) override;
+};
+
 class Preferences : public IVButtonControl
 {
 public:
