@@ -32,6 +32,7 @@ struct Segment {
 class Pattern
 {
 public:
+    static std::vector<Point> copy_pattern;
     const double PI = 3.14159265358979323846;
     int index;
     std::vector<Point> points;
@@ -49,6 +50,8 @@ public:
     void loadSine();
     void loadTriangle();
     void loadRandom(int grid);
+    void copy();
+    void paste();
 
     double get_y_curve(Segment seg, double x);
     double get_y_scurve(Segment seg, double x);

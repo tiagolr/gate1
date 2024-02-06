@@ -10,6 +10,8 @@
 #include "Pattern.h"
 #include "GATE2.h"
 
+std::vector<Point> Pattern::copy_pattern;
+
 Pattern::Pattern(GATE2& p, int i) : gate(p)
 {
     index = i;
@@ -47,15 +49,31 @@ void Pattern::removePoint(int i) {
     points.erase(points.begin() + i);
 }
 
+//void Pattern::removePointsInRange(double x1, double x2)
+//{
+//    const auto end = points.end();
+//    for (auto i = points.begin(); i != end;) {
+//        if (i->x >= x1 && i->x <= x2 && i != end - 1)
+//            i = points.erase(i);
+//        else
+//            ++i;
+//    }
+//}
+
 void Pattern::removePointsInRange(double x1, double x2)
 {
-    const auto end = points.end();
-    for (auto i = points.begin(); i != end;) {
-        if (i->x >= x1 && i->x <= x2 && i != end - 1)
-            i = points.erase(i);
-        else
-            ++i;
+  if (points.size() <= 2) return; // Skip if there are only two points or less
+
+  auto start = points.begin() + 1; // Skip the first point
+  auto end = points.end() - 1; // Skip the last point
+
+  for (auto i = start; i != end; ++i) {
+    if (i->x >= x1 && i->x <= x2) {
+      i = points.erase(i);
+      removePointsInRange(x1, x2);
+      return;
     }
+  }
 }
 
 void Pattern::invert()
@@ -69,10 +87,11 @@ void Pattern::reverse()
 {
     std::reverse(points.begin(), points.end());
 
-    for (size_t i = 0; i < points.size() - 1; ++i) {
-        auto p = points[i];
+    for (size_t i = 0; i < points.size(); ++i) {
+        auto& p = points[i];
         p.x = 1 - p.x;
-        p.tension = points[i + 1].tension * -1;
+        if (i < points.size() - 1)
+          p.tension = points[i + 1].tension * -1;
     }
 };
 
@@ -118,9 +137,21 @@ void Pattern::loadRandom(int grid) {
     for (auto i = 0; i < grid; ++i) {
         auto r1 = static_cast<double>(rand()) / RAND_MAX;
         auto r2 = static_cast<double>(rand()) / RAND_MAX;
-        insertPoint(std::fmin(0.9999999, std::fmax(0.000001, r1 / grid + i / grid)), r2, 0, 1);
+        insertPoint(std::min(0.9999999, std::max(0.000001, r1 / (double)grid + i / (double)grid)), r2, 0, 1);
     }
 };
+
+void Pattern::copy()
+{
+  copy_pattern = points;
+}
+
+void Pattern::paste()
+{
+  if (copy_pattern.size() > 0) {
+    points = copy_pattern;
+  }
+}
 
 /*
   Based of https://github.com/KottV/SimpleSide/blob/main/Source/types/SSCurve.cpp

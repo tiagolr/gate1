@@ -3,7 +3,7 @@
 #include "IControls.h"
 #include "Test/TestSizeControl.h"
 #include "View.h"
-#include "Preferences.h"
+#include "Widgets.h"
 
 const IColor GATE2::COLOR_BG = IColor::FromColorCode(0x181614);
 const IColor GATE2::COLOR_ACTIVE = IColor::FromColorCode(0xFF8050);
@@ -29,6 +29,7 @@ GATE2::GATE2(const InstanceInfo& info)
   GetParam(kSnap)->InitBool("Snap", 0);
   GetParam(kGrid)->InitInt("Grid", 8, 2, 32);
   GetParam(kRetrigger)->InitBool("Retrigger", 0);
+  
 
   // Init style
 

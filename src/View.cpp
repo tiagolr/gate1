@@ -100,9 +100,10 @@ std::vector<double> View::getMidpointXY(Segment seg)
   double y = seg.type > 1
     ? (seg.y1 + seg.y2) / 2
     : gate.pattern->get_y_at(x);
-  double xx = x * winw + winx;
-  double yy = y * winh + winy;
-  return { xx, yy };
+  return {
+    x * winw + winx,
+    y * winh + winy
+  };
 }
 
 void View::drawMidPoints(IGraphics& g)
@@ -178,6 +179,9 @@ void View::OnMouseDown(float x, float y, const IMouseMod& mod)
     if (rmousePoint > -1) {
       showRightMouseMenu((int)x, (int)y);
     }
+    else {
+      paint((int)x, (int)y, mod);
+    }
   }
 }
 
@@ -190,6 +194,11 @@ void View::OnMouseUp(float x, float y, const IMouseMod& mod)
 
 void View::OnMouseDrag(float x, float y, float dX, float dY, const IMouseMod& mod)
 {
+  if (rmousePoint == -1 && mod.R) {
+    paint((int)x, (int)y, mod);
+    return;
+  }
+
   if (selectedPoint == -1 && selectedMidpoint == -1)
     return;
 
@@ -213,12 +222,12 @@ void View::OnMouseDrag(float x, float y, float dX, float dY, const IMouseMod& mo
     if (point.y < 0) point.y = 0;
 
     if (selectedPoint == 0 && gate.linkEdgePoints) {
-      auto next = points[selectedPoint + 1];
+      auto& next = points[points.size() - 1];
       next.y = point.y;
     }
 
     if (selectedPoint == points.size() - 1 && gate.linkEdgePoints) {
-      auto first = points[0];
+      auto& first = points[0];
       first.y = point.y;
     }
 
@@ -287,6 +296,14 @@ void View::OnMouseDblClick(float x, float y, const IMouseMod& mod)
   gate.pattern->buildSegments();
 }
 
+void View::OnMouseWheel(float x, float y, const IMouseMod& mod, float d)
+{
+  auto grid = gate.GetParam(kGrid)->Value();
+  gate.GetParam(kGrid)->Set(grid + (d > 0 ? 1 : -1));
+  gate.SendCurrentParamValuesFromDelegate();
+  gate.DirtyParametersFromUI();
+}
+
 void View::showRightMouseMenu(int x, int y)
 {
   IPopupMenu* menu = new IPopupMenu();
@@ -308,6 +325,45 @@ void View::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx)
     return;
 
   gate.pattern->points[rmousePoint].type = pSelectedMenu->GetChosenItemIdx();
+  gate.pattern->buildSegments();
+}
+
+void View::paint(int x, int y, const IMouseMod& mod)
+{
+  double mousex = std::min(std::max(double(x - winx) / (double)winw, 0.), 0.9999999);
+  double mousey = std::min(std::max(double(y - winy) / (double)winh, 0.), 1.);
+  double gridsegs = (double)gate.gridSegs;
+  if (isSnapping(mod)) {
+    mousey = std::round(mousey * gridsegs) / gridsegs;
+  }
+  double seg = std::floor(mousex * gridsegs);
+  int paintMode = (int)gate.GetParam(kPaintMode)->Value();
+
+  if (paintMode == 0 || mod.A) {  // erase mode
+    gate.pattern->removePointsInRange(seg / gridsegs, (seg + 1) / gridsegs);
+  }
+  else if (paintMode == 1) { // line mode
+    gate.pattern->removePointsInRange(seg / gridsegs + 0.00001, (seg + 1) / gridsegs - 0.00001);
+    gate.pattern->insertPoint(seg / gridsegs + 0.00001, mousey, 0, 1);
+    gate.pattern->insertPoint((seg + 1) / gridsegs - 0.00001, mousey, 0, 1);
+  }
+  else if (paintMode == 2) { // saw up
+    gate.pattern->removePointsInRange(seg / gridsegs + 0.00001, (seg + 1) / gridsegs - 0.00001);
+    gate.pattern->insertPoint(seg / gridsegs + 0.00001, 1, 0, 1);
+    gate.pattern->insertPoint((seg + 1) / gridsegs - 0.00001, mousey, 0, 1);
+  }
+  else if (paintMode == 3) { // saw down
+    gate.pattern->removePointsInRange(seg / gridsegs + 0.00001, (seg + 1) / gridsegs - 0.00001);
+    gate.pattern->insertPoint(seg / gridsegs + 0.00001, mousey, 0, 1);
+    gate.pattern->insertPoint((seg + 1) / gridsegs - 0.00001, 1, 0, 1);
+  }
+  else if (paintMode == 4) { // triangle
+    gate.pattern->removePointsInRange(seg / gridsegs + 0.00001, (seg + 1) / gridsegs - 0.00001);
+    gate.pattern->insertPoint(seg / gridsegs + 0.00001, 1, 0, 1);
+    gate.pattern->insertPoint(seg / gridsegs + (((seg + 1) / gridsegs - seg / gridsegs) / 2), mousey, 0, 1);
+    gate.pattern->insertPoint((seg + 1) / gridsegs - 0.00001, 1, 0, 1);
+  }
+
   gate.pattern->buildSegments();
 }
 

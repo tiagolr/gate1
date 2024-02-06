@@ -47,7 +47,9 @@ public:
   void OnMouseDown(float x, float y, const IMouseMod& mod) override;
   void OnMouseUp(float x, float y, const IMouseMod& mod) override;
   void OnMouseDblClick(float x, float y, const IMouseMod& mod) override;
+  void OnMouseWheel(float x, float y, const IMouseMod& mod, float d);
 
+  void paint(int x, int y, const IMouseMod& mod);
   void showRightMouseMenu(int x, int y);
   void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override;
 
