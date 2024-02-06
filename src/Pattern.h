@@ -9,6 +9,7 @@
 
 #pragma once
 #include <vector>
+#include <mutex>
 
 class GATE2;  // Forward declaration
 
@@ -64,5 +65,6 @@ public:
 
 private:
     GATE2& gate;
+    std::mutex mtx;
     double mod(double a, double b);
 };

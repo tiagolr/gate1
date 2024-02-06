@@ -58,7 +58,6 @@ void Preferences::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) {
   if (pSelectedMenu == nullptr)
     return;
 
-  DBGMSG("OKAY %i %s", pSelectedMenu->GetChosenItemIdx(), pSelectedMenu->GetChosenItem()->GetText());
   auto text = pSelectedMenu->GetChosenItem()->GetText();
 
   for (int i = 1; i < 17; ++i) {
@@ -75,6 +74,7 @@ void Preferences::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) {
   else if (strcmp(text, "Dual smooth") == 0) {
     gate.dualSmooth = !gate.dualSmooth;
     gate.layoutControls(gate.GetUI());
+    gate.setSmooth();
   }
   else if (strcmp(text, "Link edge points") == 0) {
     gate.linkEdgePoints = !gate.linkEdgePoints;

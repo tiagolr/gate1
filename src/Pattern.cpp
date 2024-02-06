@@ -104,6 +104,7 @@ void Pattern::clear()
 
 void Pattern::buildSegments()
 {
+    std::lock_guard<std::mutex> lock(mtx); // prevents crash while reading Y from another thread
     segments.clear();
     for (size_t i = 0; i < points.size() - 1; ++i) {
         auto p1 = points[i];
@@ -292,6 +293,7 @@ double Pattern::get_y_smooth_stairs(Segment seg, double x)
 
 double Pattern::get_y_at(double x)
 {
+    std::lock_guard<std::mutex> lock(mtx); // prevents crash while building segments
     for (auto seg = segments.begin(); seg != segments.end(); ++seg) {
         if (seg->x1 <= x && seg->x2 >= x) {
             if (seg->type == 0) return seg->y1; // hold

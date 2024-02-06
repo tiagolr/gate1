@@ -41,6 +41,35 @@ class PlayButton;
 using namespace iplug;
 using namespace igraphics;
 
+/*
+Dual resistance a or b RC lowpass filter
+*/
+class SmoothParam
+{
+public:
+  double a; // resistance a
+  double b; // resistance b
+  double lp; // last value
+  double smooth; // latest value
+
+  void rcSet2(double rca, double rcb, double srate)
+  {
+    a = 1 / (rca * srate + 1);
+    b = 1 / (rcb * srate + 1);
+  }
+
+  double rcLP2(double s, bool ab)
+  {
+    return lp += ab ? a * (s - lp) : b * (s - lp);
+  }
+
+  double smooth2(double s, bool ab)
+  {
+    lp = smooth;
+    return smooth = rcLP2(s, ab);
+  }
+};
+
 class GATE2 final : public Plugin
 {
 public:
@@ -64,6 +93,7 @@ public:
   double beatPos = 0;
   int winpos = 0;
   int lwinpos = 0;
+  SmoothParam* value;
   std::vector<sample> preSamples;
   std::vector<sample> postSamples;
 
@@ -99,6 +129,7 @@ public:
   void OnParentWindowResize(int width, int height) override;
   bool OnHostRequestingSupportedViewConfiguration(int width, int height) override;
   void OnHostSelectedViewConfiguration(int width, int height) override;
+  void setSmooth();
 
   double getY(double x, double min, double max);
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;

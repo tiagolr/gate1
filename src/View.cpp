@@ -31,7 +31,6 @@ void View::Draw(IGraphics& g) {
   drawSegments(g);
   drawMidPoints(g);
   drawPoints(g);
-  // (mode == 0 && play_state & 1) || always_playing || (mode == 2 && midi_trigger)
   if ((!gate.midiMode && gate.isPlaying) || gate.alwaysPlaying || (gate.midiMode && gate.midiTrigger)) {
     drawSeek(g);
   }
@@ -41,7 +40,7 @@ void View::drawWave(IGraphics& g, std::vector<sample> samples, IColor color)
 {
   double lastX = winx;
   double lastY = winh - std::min(std::abs(samples[0]),1.) * winh + winy;
-  color = color.WithOpacity(0.3);
+  color = color.WithOpacity(0.4);
   for (int i = 0; i < winw; ++i) {
     double ypos = std::min(samples[i], 1.);
     g.DrawLine(ypos == 0 ? COLOR_TRANSPARENT : color, i + winx, winy + winh, i + winx, winh - ypos * winh + winy);

@@ -33,6 +33,7 @@ GATE2::GATE2(const InstanceInfo& info)
 
   preSamples.resize(PLUG_MAX_WIDTH, 0);
   postSamples.resize(PLUG_MAX_WIDTH, 0);
+  value = new SmoothParam();
 
   // init patterns
   for (int i = 0; i < 12; i++) {
@@ -180,8 +181,22 @@ GATE2::GATE2(const InstanceInfo& info)
     g->AttachControl(preferencesControl);
 
     inited = true;
+    setSmooth();
     layoutControls(g);
   };
+}
+
+void GATE2::setSmooth()
+{
+  if (dualSmooth) {
+    auto const attack = GetParam(kAttack)->Value();
+    auto const release = GetParam(kRelease)->Value();
+    value->rcSet2(attack * 0.0025, release * 0.0025, GetSampleRate());
+  }
+  else {
+    auto const lfosmooth = GetParam(kSmooth)->Value();
+    value->rcSet2(lfosmooth * 0.0025, lfosmooth * 0.0025, GetSampleRate());
+  }
 }
 
 void GATE2::layoutControls(IGraphics* g)
@@ -287,6 +302,9 @@ void GATE2::OnParamChange(int paramIdx)
   else if (paramIdx == kRetrigger && GetParam(kRetrigger)->Value() == 1) {
     midiTrigger = true;
   }
+  else if (paramIdx == kAttack || paramIdx == kRelease || paramIdx == kSmooth) {
+    setSmooth();
+  }
 }
 
 void GATE2::OnParentWindowResize(int width, int height)
@@ -325,6 +343,7 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
     beatPos = GetPPQPos();
   const double lfomin = GetParam(kMin)->Value() / 100;
   const double lfomax = GetParam(kMax)->Value() / 100;
+  double nextValue;
 
   auto processDisplaySamples = [&](int s) {
     winpos = std::floor(xpos * view->winw);
@@ -347,11 +366,6 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       postSamples[winpos] = avgPostSample;
   };
 
-  // reset play position for Hz sync mode
-  //mode == 0 && !sync && (play_state & 1) && (!lplay_state & 1) ? (
-  //  beat_pos = 0;
-  //);
-
   //mode == 0 && always_playing && !(play_state & 1) && retrigger && !lretrigger ? (
   //  retrigger_lfo();
   //);  
@@ -368,7 +382,9 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       }
       xpos -= std::floor(xpos);
 
-      ypos = getY(xpos, lfomin, lfomax);
+      nextValue = getY(xpos, lfomin, lfomax);
+      ypos = value->smooth2(nextValue, nextValue > ypos);
+
       for (int c = 0; c < nChans; ++c) {
         outputs[c][s] = inputs[c][s] * ypos;
       }
@@ -393,7 +409,8 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       else {
         xpos -= std::floor(xpos);
       }
-      ypos = getY(xpos, lfomin, lfomax);
+      nextValue = getY(xpos, lfomin, lfomax);
+      ypos = value->smooth2(nextValue, nextValue > ypos);
       for (int c = 0; c < nChans; ++c) {
         outputs[c][s] = inputs[c][s] * ypos;
       }
@@ -435,6 +452,20 @@ void GATE2::OnReset()
   preSamples.resize(PLUG_MAX_WIDTH, 0);
   postSamples.clear();
   postSamples.resize(PLUG_MAX_WIDTH, 0);
+  bool sync = GetParam(kSync)->Value() > 0;
+  double phase = GetParam(kPhase)->Value();
+  double min = GetParam(kMin)->Value() / 100;
+  double max = GetParam(kMax)->Value() / 100;
+
+  if (sync) {
+    double x = GetPPQPos() / syncQN + phase;
+    x -= std::floor(x);
+    value->smooth = getY(x, min, max); // reset value.smooth on play
+  }
+
+  if (!midiMode && !sync) {
+    beatPos = 0; // reset beatPos on play in Hz mode
+  }
 }
 
 void GATE2::OnIdle()
