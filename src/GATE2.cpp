@@ -9,8 +9,7 @@ const IColor GATE2::COLOR_BG = IColor::FromColorCode(0x181614);
 const IColor GATE2::COLOR_ACTIVE = IColor::FromColorCode(0xFF8050);
 const IColor GATE2::COLOR_ACTIVE_LIGHT = IColor::FromColorCode(0xffb193);
 const IColor GATE2::COLOR_ACTIVE_DARK = IColor::FromColorCode(0x88442b);
-const IColor GATE2::COLOR_SEEK = IColor::FromColorCode(0x80FFFF, 0x80);
-const IColor GATE2::COLOR_SEEK_CIRCLE = IColor::FromColorCode(0x80FFFF);
+const IColor GATE2::COLOR_SEEK = IColor::FromColorCode(0x80FFFF);
 
 GATE2::GATE2(const InstanceInfo& info)
 : Plugin(info, MakeConfig(kNumParams, kNumPresets))
@@ -31,9 +30,8 @@ GATE2::GATE2(const InstanceInfo& info)
   GetParam(kSnap)->InitBool("Snap", 0);
   GetParam(kGrid)->InitInt("Grid", 8, 2, 32);
   GetParam(kRetrigger)->InitBool("Retrigger", 0);
-  
-
-  // Init style
+  preSamples.resize(PLUG_MAX_WIDTH);
+  postSamples.resize(PLUG_MAX_WIDTH);
 
   // init patterns
   for (int i = 0; i < 12; i++) {
@@ -291,19 +289,6 @@ double inline GATE2::getY(double x, double min, double max)
   return min + (max - min) * (1 - pattern->get_y_at(x));
 }
 
-/*
-void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
-{
-  const int nChans = NOutChansConnected();
-
-  for (int s = 0; s < nFrames; s++) {
-    for (int c = 0; c < nChans; c++) {
-      outputs[c][s] = inputs[c][s] * 0.01;
-    }
-  }
-}
-*/
-
 void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
   const int nChans = NOutChansConnected();
@@ -343,6 +328,25 @@ void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       for (int c = 0; c < nChans; ++c) {
         outputs[c][s] = inputs[c][s] * ypos;
       }
+
+      winpos = std::floor(xpos * view->winw);
+      if (lwinpos != winpos) {
+        preSamples[winpos] = 0;
+        postSamples[winpos] = 0;
+      }
+      lwinpos = winpos;
+      double avgPreSample = 0;
+      double avgPostSample = 0;
+      for (int c = 0; c < nChans; ++c) {
+        avgPreSample += inputs[c][s];
+        avgPostSample += outputs[c][s];
+      }
+      avgPreSample = std::abs(avgPreSample / nChans);
+      avgPostSample = std::abs(avgPostSample / nChans);
+      if (preSamples[winpos] < avgPreSample)
+        preSamples[winpos] = avgPreSample;
+      if (postSamples[winpos] < avgPostSample)
+        postSamples[winpos] = avgPostSample;
     }
   }
 }

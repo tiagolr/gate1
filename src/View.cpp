@@ -23,11 +23,32 @@ void View::OnResize() {
 }
 
 void View::Draw(IGraphics& g) {
+  if (gate.drawWave && (gate.alwaysPlaying || gate.isPlaying)) {
+    drawWave(g, gate.preSamples, IColor(255, 127, 127, 127));
+    drawWave(g, gate.postSamples, GATE2::COLOR_ACTIVE);
+  }
   drawGrid(g);
   drawSegments(g);
   drawMidPoints(g);
   drawPoints(g);
-  drawSeek(g);
+  // (mode == 0 && play_state & 1) || always_playing || (mode == 2 && midi_trigger)
+  if (gate.isPlaying || gate.alwaysPlaying) {
+    drawSeek(g);
+  }
+}
+
+void View::drawWave(IGraphics& g, std::vector<sample> samples, IColor color)
+{
+  double lastX = winx;
+  double lastY = winh - std::min(std::abs(samples[0]),1.) * winh + winy;
+  color = color.WithOpacity(0.3);
+  for (int i = 0; i < winw; ++i) {
+    double ypos = std::min(samples[i], 1.);
+    g.DrawLine(ypos == 0 ? COLOR_TRANSPARENT : color, i + winx, winy + winh, i + winx, winh - ypos * winh + winy);
+    //g.DrawLine(color.WithOpacity(ypos == 0 ? 0 : 0.5), lastX, lastY, i + winx, winh - ypos * winh + winy, 0, 2);
+    lastX = i + winx;
+    lastY = winh - ypos * winh + winy;
+  }
 }
 
 void View::drawGrid(IGraphics& g)
@@ -54,7 +75,7 @@ void View::drawSegments(IGraphics& g)
   double lastY = points[0].y * winh + winy;
 
   auto colorBold = COLOR_WHITE;
-  auto colorLight = COLOR_WHITE.WithOpacity(0.0625);
+  auto colorLight = COLOR_WHITE.WithOpacity(0.125);
 
   for (int i = 0; i < winw + 1; ++i)
   {
@@ -133,11 +154,8 @@ void View::drawMidPoints(IGraphics& g)
 
 void View::drawSeek(IGraphics& g)
 {
-  // (mode == 0 && play_state & 1) || always_playing || (mode == 2 && midi_trigger)
-  if (gate.isPlaying || gate.alwaysPlaying) {
-    g.DrawLine(GATE2::COLOR_SEEK, gate.xpos * winw + winx, winy, gate.xpos * winw + winx, winy + winh);
-    g.DrawCircle(GATE2::COLOR_SEEK_CIRCLE, gate.xpos * winw + winx, (1 - gate.ypos) * winh + winy, 5);
-  }
+  g.DrawLine(GATE2::COLOR_SEEK.WithOpacity(0.5), gate.xpos * winw + winx, winy, gate.xpos * winw + winx, winy + winh);
+  g.DrawCircle(GATE2::COLOR_SEEK, gate.xpos * winw + winx, (1 - gate.ypos) * winh + winy, 5);
 }
 
 int View::getHoveredPoint(int x, int y)

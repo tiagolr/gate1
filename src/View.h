@@ -34,6 +34,7 @@ public:
   bool IsDirty() override {
     return true;
   }
+  void drawWave(IGraphics& g, std::vector<sample> samples, IColor color);
   void drawGrid(IGraphics& g);
   void drawSegments(IGraphics& g);
   void drawMidPoints(IGraphics& g);

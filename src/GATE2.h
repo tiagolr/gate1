@@ -43,26 +43,31 @@ using namespace igraphics;
 class GATE2 final : public Plugin
 {
 public:
-  bool inited = false;
-  bool snap = false;
-  int gridSegs = 8;
+  // prefs
   bool linkEdgePoints = false;
   bool dualSmooth = true;
-  double tensionMult = 0;
   int triggerChannel = 10;
   bool drawWave = true;
-  double syncQN = 0;
-  bool isPlaying = false;
   bool alwaysPlaying = false;
+  // state
+  bool inited = false;
+  bool isPlaying = false;
+  bool snap = false;
+  int gridSegs = 8;
+  double tensionMult = 0;
+  double syncQN = 0;
   double xpos = 0;
   double ypos = 0;
+  int winpos = 0;
+  int lwinpos = 0;
+  std::vector<sample> preSamples;
+  std::vector<sample> postSamples;
 
   static const IColor COLOR_BG;
   static const IColor COLOR_ACTIVE;
   static const IColor COLOR_ACTIVE_DARK;
   static const IColor COLOR_ACTIVE_LIGHT;
   static const IColor COLOR_SEEK;
-  static const IColor COLOR_SEEK_CIRCLE;
 
   Pattern* pattern;
   Pattern* patterns[12];
