@@ -15,10 +15,10 @@
 
 #define SHARED_RESOURCES_SUBPATH "GATE2"
 
-#define PLUG_CHANNEL_IO "0-2"
+#define PLUG_CHANNEL_IO "1-1 2-2"
 
 #define PLUG_LATENCY 0
-#define PLUG_TYPE 1
+#define PLUG_TYPE 0
 #define PLUG_DOES_MIDI_IN 1
 #define PLUG_DOES_MIDI_OUT 0
 #define PLUG_DOES_MPE 0
@@ -47,11 +47,11 @@
 #define AAX_PLUG_CATEGORY_STR "Effect"
 #define AAX_DOES_AUDIOSUITE 0
 
-#define VST3_SUBCATEGORY "Instrument|Synth"
+#define VST3_SUBCATEGORY "Fx|Modulation"
 
 #define APP_NUM_CHANNELS 2
 #define APP_N_VECTOR_WAIT 0
-#define APP_MULT 0.25
+#define APP_MULT 1
 #define APP_COPY_AUV3 0
 #define APP_SIGNAL_VECTOR_SIZE 64
 

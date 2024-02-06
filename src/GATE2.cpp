@@ -239,6 +239,25 @@ void GATE2::OnParamChange(int paramIdx)
   }
   else if (paramIdx == kSync) {
     layoutControls(GetUI());
+    auto sync = GetParam(kSync)->Value();
+    if (sync == 0) syncQN = 0;
+    if (sync == 1) syncQN = 1/4; // 1/16
+    if (sync == 2) syncQN = 1/2; // 1/8
+    if (sync == 3) syncQN = 1/1; // 1/4
+    if (sync == 4) syncQN = 1*2; // 1/2
+    if (sync == 5) syncQN = 1*4; // 1bar
+    if (sync == 6) syncQN = 1*8; // 2bar
+    if (sync == 7) syncQN = 1*16; // 4bar
+    if (sync == 8) syncQN = 1/6; // 1/16t
+    if (sync == 9) syncQN = 1/3; // 1/8t
+    if (sync == 10) syncQN = 2/3; // 1/4t
+    if (sync == 11) syncQN = 4/3; // 1/2t
+    if (sync == 12) syncQN = 8/3; // 1/1t
+    if (sync == 13) syncQN = 1/4*1.5; // 1/16.
+    if (sync == 14) syncQN = 1/2*1.5; // 1/8.
+    if (sync == 15) syncQN = 1/1*1.5; // 1/4.
+    if (sync == 16) syncQN = 2/1*1.5; // 1/2.
+    if (sync == 17) syncQN = 4/1*1.5; // 1/1.
   }
   else if (paramIdx == kGrid) {
     gridSegs = (int)GetParam(kGrid)->Value();
@@ -265,16 +284,65 @@ void GATE2::OnHostSelectedViewConfiguration(int width, int height)
     GetUI()->Resize(width, height, 1.f, true);
 }
 
+double inline GATE2::getY(double x, double min, double max)
+{
+  return min + (max - min) * (1 - pattern->get_y_at(x));
+}
+
+/*
 void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
-  //const double gain = GetParam(kGain)->DBToAmp();
+  const int nChans = NOutChansConnected();
 
-  //for (int s = 0; s < nFrames; s++) {
-  //  outputs[0][s] = mOsc.Process() * gain;
-  //  outputs[1][s] = outputs[0][s];
-  //}
+  for (int s = 0; s < nFrames; s++) {
+    for (int c = 0; c < nChans; c++) {
+      outputs[c][s] = inputs[c][s] * 0.01;
+    }
+  }
+}
+*/
 
-  //mScopeSender.ProcessBlock(outputs, nFrames, kCtrlTagScope, 1);
+void GATE2::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
+{
+  const int nChans = NOutChansConnected();
+  const double srate = GetSampleRate();
+  const double tempo = GetTempo();
+  const double beatsPerSpl = tempo / (60. * srate);
+  const bool isPlaying = GetTransportIsRunning();
+  const double sync = GetParam(kSync)->Value();
+  const double phase = GetParam(kPhase)->Value();
+  const double ratehz = GetParam(kRate)->Value();
+  double beatPos = GetPPQPos();
+  const double lfomin = GetParam(kMin)->Value() / 100;
+  const double lfomax = GetParam(kMax)->Value() / 100;
+
+  // reset play position for Hz sync mode
+  //mode == 0 && !sync && (play_state & 1) && (!lplay_state & 1) ? (
+  //  beat_pos = 0;
+  //);
+
+  //mode == 0 && always_playing && !(play_state & 1) && retrigger && !lretrigger ? (
+  //  retrigger_lfo();
+  //);
+
+  if (isPlaying) {
+    for (int s = 0; s < nFrames; ++s) {
+      if (sync > 0) {
+        beatPos += beatsPerSpl;
+        xpos = beatPos / syncQN + phase;
+      }
+      else {
+        beatPos += 1 / srate * ratehz;
+        xpos = beatPos + phase;
+      }
+      xpos -= std::floor(xpos);
+
+      ypos = getY(xpos, lfomin, lfomax);
+      for (int c = 0; c < nChans; ++c) {
+        outputs[c][s] = inputs[c][s] * ypos;
+      }
+    }
+  }
 }
 
 void GATE2::ProcessMidiMsg(const IMidiMsg& msg)

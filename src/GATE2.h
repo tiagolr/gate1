@@ -51,6 +51,10 @@ public:
   double tensionMult = 0;
   int triggerChannel = 10;
   bool drawWave = true;
+  double syncQN = 0;
+  bool alwaysPlaying = false;
+  double xpos = 0;
+  double ypos = 0;
 
   static const IColor COLOR_BG;
   static const IColor COLOR_ACTIVE;
@@ -81,7 +85,8 @@ public:
   void OnParentWindowResize(int width, int height) override;
   bool OnHostRequestingSupportedViewConfiguration(int width, int height) override;
   void OnHostSelectedViewConfiguration(int width, int height) override;
-  
+
+  double getY(double x, double min, double max);
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
   void ProcessMidiMsg(const IMidiMsg& msg) override;
   void OnIdle() override;
