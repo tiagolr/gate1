@@ -17,6 +17,15 @@ public:
   void DrawIndicatorTrack(IGraphics& g, float angle, float cx, float cy, float radius) override;
 };
 
+class PatternSwitches : public IVTabSwitchControl
+{
+public:
+  PatternSwitches(const IRECT& bounds, int paramIdx, const std::vector<const char*>& options, const char* label, const IVStyle& style, EVShape shape, EDirection direction)
+    : IVTabSwitchControl(bounds, paramIdx, options, label, style, shape, direction) {};
+
+  void DrawButton(IGraphics& g, const IRECT& r, bool pressed, bool mouseOver, ETabSegment segment, bool disabled) override;
+};
+
 class PlayButton : public IControl
 {
 public:

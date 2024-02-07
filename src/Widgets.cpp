@@ -21,6 +21,11 @@ void Rotary::DrawIndicatorTrack(IGraphics& g, float angle, float cx, float cy, f
   }
 }
 
+void PatternSwitches::DrawButton(IGraphics& g, const IRECT& r, bool pressed, bool mouseOver, ETabSegment segment, bool disabled)
+{
+  DrawPressableRectangle(g, r, pressed, mouseOver, disabled, segment == ETabSegment::Start, segment == ETabSegment::End, segment == ETabSegment::Start, segment == ETabSegment::End);
+}
+
 void PlayButton::Draw(IGraphics& g)
 {
   IRECT r = mRECT.GetPadded(-2);

@@ -56,6 +56,7 @@ GATE1::GATE1(const InstanceInfo& info)
       return;
     }
 
+    g->EnableTooltips(true);
     g->EnableMouseOver(true);
     g->SetLayoutOnResize(true);
     g->LoadFont("Roboto-Regular", ROBOTO_FN);
@@ -63,7 +64,7 @@ GATE1::GATE1(const InstanceInfo& info)
 
     //Create styles
     IVColorSpec switchColors = {
-      COLOR_BG,
+      COLOR_TRANSPARENT,
       COLOR_ACTIVE_DARK,
       COLOR_ACTIVE,
       COLOR_BG,
@@ -77,7 +78,7 @@ GATE1::GATE1(const InstanceInfo& info)
     patternSwitchStyle.valueText = patternSwitchStyle.valueText.WithFont("Roboto-Bold");
 
     IVColorSpec rotaryColors = {
-      COLOR_BG,
+      COLOR_TRANSPARENT,
       COLOR_BG,
       COLOR_BG,
       COLOR_ACTIVE,
@@ -96,7 +97,7 @@ GATE1::GATE1(const InstanceInfo& info)
     rotaryStyle.labelText = rotaryStyle.labelText.WithFont("Roboto-Bold");
 
     IVColorSpec buttonColors = {
-      COLOR_BG,
+      COLOR_TRANSPARENT,
       COLOR_ACTIVE_DARK,
       COLOR_ACTIVE,
       COLOR_BG,
@@ -104,11 +105,12 @@ GATE1::GATE1(const InstanceInfo& info)
       COLOR_BG,
     };
     IVStyle buttonStyle = (new IVStyle())->WithColors(buttonColors);
-    buttonStyle.roundness = 0.5;
+    buttonStyle.roundness = 0.25;
     buttonStyle.showLabel = false;
     buttonStyle.valueText.mFGColor = COLOR_BG;
     buttonStyle.valueText.mSize = 16;
     buttonStyle.valueText = buttonStyle.valueText.WithFont("Roboto-Bold");
+    buttonStyle.shadowOffset = 0;
 
     IVColorSpec numberColors = {
       COLOR_BG,
@@ -118,6 +120,7 @@ GATE1::GATE1(const InstanceInfo& info)
       COLOR_TRANSPARENT,
     };
     IVStyle numberStyle = (new IVStyle())->WithColors(numberColors);
+    numberStyle.shadowOffset = 0;
     numberStyle.roundness = 0.5;
     numberStyle.valueText.mFGColor = COLOR_ACTIVE;
     numberStyle.valueText.mSize = 16;
@@ -127,15 +130,16 @@ GATE1::GATE1(const InstanceInfo& info)
     numberStyle.labelText = numberStyle.labelText.WithFont("Roboto-Bold");
 
     //Create controls
-    IRECT rect;
-    view = new View(rect, *this);
+    view = new View(IRECT(), *this);
     g->AttachPanelBackground(COLOR_BG);
     g->AttachControl(view);
     auto t = IText(26, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
     g->AttachControl(new ITextControl(IRECT(10,14,100,35), "GATE-1", t, true));
-    patternSwitches = new IVTabSwitchControl(IRECT(), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle, EVShape::EndsRounded);
+    patternSwitches = new PatternSwitches(IRECT(), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle, EVShape::EndsRounded, EDirection::Horizontal);
+    patternSwitches->SetTooltip("Patterns");
     g->AttachControl(patternSwitches);
     syncControl = new ICaptionControl(IRECT(), kSync, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
+    syncControl->SetTooltip("Tempo sync");
     g->AttachControl(syncControl);
     rateControl = new Rotary(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(rateControl);
@@ -154,8 +158,10 @@ GATE1::GATE1(const InstanceInfo& info)
     tensionControl = new Rotary(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(tensionControl);
     pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
+    pointModeControl->SetTooltip("Point mode");
     g->AttachControl(pointModeControl);
     paintModeControl = new ICaptionControl(IRECT(), kPaintMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
+    paintModeControl->SetTooltip("Paint mode (RMB)");
     g->AttachControl(paintModeControl);
     playControl = new PlayButton(IRECT(), [&](IControl* pCaller){
       alwaysPlaying = !alwaysPlaying;
@@ -163,6 +169,7 @@ GATE1::GATE1(const InstanceInfo& info)
       playControl->SetDirty(false);
     });
     playControl->SetValue(alwaysPlaying ? 1 : 0);
+    playControl->SetTooltip("Always playing on/off");
     g->AttachControl(playControl);
     midiModeControl = new IVToggleControl(IRECT(), [&](IControl* pCaller) {
       midiMode = !midiMode;
@@ -170,6 +177,7 @@ GATE1::GATE1(const InstanceInfo& info)
       midiModeControl->SetDirty(false);
     }, "", buttonStyle, "MIDI", "MIDI");
     midiModeControl->SetValue(midiMode ? 1 : 0);
+    midiModeControl->SetTooltip("MIDI mode - use midi notes to trigger envelope");
     g->AttachControl(midiModeControl);
     snapControl = new IVToggleControl(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
     g->AttachControl(snapControl);
@@ -207,7 +215,7 @@ void GATE1::layoutControls(IGraphics* g)
 
   const IRECT b = g->GetBounds();
   g->GetBackgroundControl()->SetTargetAndDrawRECTs(b);
-  view->SetTargetAndDrawRECTs(b.GetReducedFromTop(165));
+  view->SetTargetAndDrawRECTs(b.GetReducedFromTop(160));
 
   // first row left
   int drawx = 100;
@@ -221,7 +229,7 @@ void GATE1::layoutControls(IGraphics* g)
   preferencesControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy+10, drawx+40, drawy+25+10));
 
   // second row left
-  drawy = 50;
+  drawy = 45;
   drawx = 0;
   rateControl->Hide(GetParam(kSync)->Value() > 0);
   if (!rateControl->IsHidden()) {
@@ -251,7 +259,7 @@ void GATE1::layoutControls(IGraphics* g)
 
   // third row left
   drawx = 10;
-  drawy = 140;
+  drawy = 135;
   paintModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
   drawx += 90;
   pointModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
@@ -259,10 +267,11 @@ void GATE1::layoutControls(IGraphics* g)
   playControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20 , drawy+20));
 
   // third row right
-  drawx = b.R - 73;
-  midiModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 70, drawy + 30));
+  drawy = 132; // for some reason the alignment with the left side mismatches
+  drawx = b.R - 10 - 60;
+  midiModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 60, drawy + 25));
   drawx -= 65;
-  snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+70, drawy+30));
+  snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+60, drawy+25));
   drawx -= 80;
   gridNumber->SetTargetAndDrawRECTs(IRECT(drawx+30, drawy+3, drawx+40+40, drawy+20+3));
 }
@@ -276,23 +285,24 @@ void GATE1::OnParamChange(int paramIdx)
     layoutControls(GetUI());
     auto sync = GetParam(kSync)->Value();
     if (sync == 0) syncQN = 0;
-    if (sync == 1) syncQN = 1/4; // 1/16
-    if (sync == 2) syncQN = 1/2; // 1/8
+    if (sync == 1) syncQN = 1./4.; // 1/16
+    if (sync == 2) syncQN = 1./2.; // 1/8
     if (sync == 3) syncQN = 1/1; // 1/4
     if (sync == 4) syncQN = 1*2; // 1/2
     if (sync == 5) syncQN = 1*4; // 1bar
     if (sync == 6) syncQN = 1*8; // 2bar
     if (sync == 7) syncQN = 1*16; // 4bar
-    if (sync == 8) syncQN = 1/6; // 1/16t
-    if (sync == 9) syncQN = 1/3; // 1/8t
-    if (sync == 10) syncQN = 2/3; // 1/4t
-    if (sync == 11) syncQN = 4/3; // 1/2t
-    if (sync == 12) syncQN = 8/3; // 1/1t
-    if (sync == 13) syncQN = 1/4*1.5; // 1/16.
-    if (sync == 14) syncQN = 1/2*1.5; // 1/8.
-    if (sync == 15) syncQN = 1/1*1.5; // 1/4.
-    if (sync == 16) syncQN = 2/1*1.5; // 1/2.
-    if (sync == 17) syncQN = 4/1*1.5; // 1/1.
+    if (sync == 8) syncQN = 1./6.; // 1/16t
+    if (sync == 9) syncQN = 1./3.; // 1/8t
+    if (sync == 10) syncQN = 2./3.; // 1/4t
+    if (sync == 11) syncQN = 4./3.; // 1/2t
+    if (sync == 12) syncQN = 8./3.; // 1/1t
+    if (sync == 13) syncQN = 1./4.*1.5; // 1/16.
+    if (sync == 14) syncQN = 1./2.*1.5; // 1/8.
+    if (sync == 15) syncQN = 1./1.*1.5; // 1/4.
+    if (sync == 16) syncQN = 2./1.*1.5; // 1/2.
+    if (sync == 17) syncQN = 4./1.*1.5; // 1/1.
+    DBGMSG("SYNC %.2f QN %.2f\n", sync, syncQN);
   }
   else if (paramIdx == kGrid) {
     gridSegs = (int)GetParam(kGrid)->Value();
@@ -420,6 +430,7 @@ void GATE1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       processDisplaySamples(s);
     }
   }
+
   // keep processing the same position if stopped in MIDI mode
   else if (midiMode && !alwaysPlaying && !midiTrigger) {
     for (int s = 0; s < nFrames; ++s) {

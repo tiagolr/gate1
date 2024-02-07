@@ -38,6 +38,7 @@ class View;
 class Preferences;
 class PlayButton;
 class Rotary;
+class PatternSwitches;
 
 using namespace iplug;
 using namespace igraphics;
@@ -107,7 +108,7 @@ public:
   Pattern* pattern;
   Pattern* patterns[12];
   View* view;
-  IVTabSwitchControl* patternSwitches;
+  PatternSwitches* patternSwitches;
   ICaptionControl* syncControl;
   Preferences* preferencesControl;
   Rotary* rateControl;
