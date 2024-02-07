@@ -1,6 +1,26 @@
 #include "Widgets.h"
 #include <string>
 
+void Rotary::DrawWidget(IGraphics& g)
+{
+  float widgetRadius = GetRadius() - 2;
+  const float cx = mWidgetBounds.MW(), cy = mWidgetBounds.MH() + 2;
+  IRECT knobHandleBounds = mWidgetBounds.GetCentredInside((widgetRadius - mTrackToHandleDistance - 2) * 2.f ).GetVShifted(2);
+  const float angle = mAngle1 + (static_cast<float>(GetValue()) * (mAngle2 - mAngle1));
+  DrawIndicatorTrack(g, angle, cx, cy, widgetRadius);
+  g.FillEllipse(IColor::FromColorCode(0x282D32), knobHandleBounds);
+  DrawPointer(g, angle, cx, cy, knobHandleBounds.W() / 2.f);
+}
+
+void Rotary::DrawIndicatorTrack(IGraphics& g, float angle, float cx, float cy, float radius)
+{
+  g.DrawArc(IColor::FromColorCode(0x282D32), cx, cy, radius, -135, 135, &mBlend, mTrackSize);
+  if (mTrackSize > 0.f)
+  {
+    g.DrawArc(GetColor(kX1), cx, cy, radius, angle >= mAnchorAngle ? mAnchorAngle : mAnchorAngle - (mAnchorAngle - angle), angle >= mAnchorAngle ? angle : mAnchorAngle, &mBlend, mTrackSize);
+  }
+}
+
 void PlayButton::Draw(IGraphics& g)
 {
   IRECT r = mRECT.GetPadded(-2);

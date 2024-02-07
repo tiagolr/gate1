@@ -88,6 +88,7 @@ GATE1::GATE1(const InstanceInfo& info)
     IVStyle rotaryStyle = (new IVStyle())->WithColors(rotaryColors);
     rotaryStyle.frameThickness = 2;
     rotaryStyle.shadowOffset = 0;
+    rotaryStyle.drawFrame = false;
     rotaryStyle.valueText.mFGColor = COLOR_WHITE;
     rotaryStyle.valueText = rotaryStyle.valueText.WithFont("Roboto-Bold");
     rotaryStyle.labelText.mFGColor = COLOR_WHITE;
@@ -136,21 +137,21 @@ GATE1::GATE1(const InstanceInfo& info)
     g->AttachControl(patternSwitches);
     syncControl = new ICaptionControl(IRECT(), kSync, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
     g->AttachControl(syncControl);
-    rateControl = new IVKnobControl(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    rateControl = new Rotary(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(rateControl);
-    phaseControl = new IVKnobControl(IRECT(), kPhase, "Phase", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    phaseControl = new Rotary(IRECT(), kPhase, "Phase", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(phaseControl);
-    minControl = new IVKnobControl(IRECT(), kMin, "Min", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    minControl = new Rotary(IRECT(), kMin, "Min", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(minControl);
-    maxControl = new IVKnobControl(IRECT(), kMax, "Max", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    maxControl = new Rotary(IRECT(), kMax, "Max", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(maxControl);
-    smoothControl = new IVKnobControl(IRECT(), kSmooth, "Smooth", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    smoothControl = new Rotary(IRECT(), kSmooth, "Smooth", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(smoothControl);
-    attackControl = new IVKnobControl(IRECT(), kAttack, "Attack", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    attackControl = new Rotary(IRECT(), kAttack, "Attack", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(attackControl);
-    releaseControl = new IVKnobControl(IRECT(), kRelease, "Release", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+    releaseControl = new Rotary(IRECT(), kRelease, "Release", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(releaseControl);
-    tensionControl = new IVKnobControl(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
+    tensionControl = new Rotary(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
     g->AttachControl(tensionControl);
     pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
     g->AttachControl(pointModeControl);
@@ -475,3 +476,77 @@ void GATE1::OnReset()
 void GATE1::OnIdle()
 {
 }
+
+bool GATE1::SerializeState(IByteChunk &chunk) const
+{
+  chunk.Put(&linkEdgePoints);
+  chunk.Put(&dualSmooth);
+  chunk.Put(&triggerChannel);
+  chunk.Put(&drawWave);
+  chunk.Put(&alwaysPlaying);
+  chunk.Put(&midiMode);
+
+  // reserved space
+  int cSize = chunk.Size();
+  char zero[1];
+  memset(zero, 0, 1);
+  for (int i = 0; i < 1024 - cSize; ++i)
+    chunk.PutBytes(zero, 1);
+
+  // serialize patterns
+  for (int i = 0; i < 12; ++i) {
+    auto pattern = patterns[i];
+    int size = pattern->points.size();
+    chunk.Put(&size);
+    for (int j = 0; j < size; ++j) {
+      auto point = pattern->points[j];
+      chunk.Put(&point);
+    }
+  }
+
+  return SerializeParams(chunk);
+}
+
+// this over-ridden method is called when the host is trying to load the plug-in state and you need to unpack the data into your algorithm
+int GATE1::UnserializeState(const IByteChunk &chunk, int startPos)
+{
+  startPos = chunk.Get(&linkEdgePoints, startPos);
+  startPos = chunk.Get(&dualSmooth, startPos);
+  startPos = chunk.Get(&triggerChannel, startPos);
+  startPos = chunk.Get(&drawWave, startPos);
+  startPos = chunk.Get(&alwaysPlaying, startPos);
+  startPos = chunk.Get(&midiMode, startPos);
+
+  // reserved space
+  char buffer[1];
+  int size = 1024 - startPos;
+  for (int i = 0; i < size; ++i)
+    startPos = chunk.GetBytes(buffer, 1, startPos);
+
+  for (int i = 0; i < 12; ++i) {
+    auto pattern = patterns[i];
+    pattern->points.clear();
+    int size;
+    startPos = chunk.Get(&size, startPos);
+    for (int j = 0; j < size; ++j) {
+      Point point;
+      startPos = chunk.Get(&point, startPos);
+      pattern->points.push_back(point);
+    }
+    pattern->buildSegments();
+  }
+
+  return UnserializeParams(chunk, startPos);
+}
+
+void GATE1::OnRestoreState() {
+  SendCurrentParamValuesFromDelegate();
+  setSmooth();
+
+  // FIX - erases extra drawn knob
+  auto g = GetUI();
+  if (g) {
+    g->Resize(g->WindowWidth() + 1, g->WindowHeight() + 1, 1.f, true);
+    g->Resize(g->WindowWidth() - 1, g->WindowHeight() - 1, 1.f, true);
+  }
+};

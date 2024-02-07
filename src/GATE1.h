@@ -37,6 +37,7 @@ enum EControlTags
 class View;
 class Preferences;
 class PlayButton;
+class Rotary;
 
 using namespace iplug;
 using namespace igraphics;
@@ -109,14 +110,14 @@ public:
   IVTabSwitchControl* patternSwitches;
   ICaptionControl* syncControl;
   Preferences* preferencesControl;
-  IVKnobControl* rateControl;
-  IVKnobControl* phaseControl;
-  IVKnobControl* minControl;
-  IVKnobControl* maxControl;
-  IVKnobControl* smoothControl;
-  IVKnobControl* attackControl;
-  IVKnobControl* releaseControl;
-  IVKnobControl* tensionControl;
+  Rotary* rateControl;
+  Rotary* phaseControl;
+  Rotary* minControl;
+  Rotary* maxControl;
+  Rotary* smoothControl;
+  Rotary* attackControl;
+  Rotary* releaseControl;
+  Rotary* tensionControl;
   ICaptionControl* pointModeControl;
   ICaptionControl* paintModeControl;
   PlayButton* playControl;
@@ -130,6 +131,7 @@ public:
   bool OnHostRequestingSupportedViewConfiguration(int width, int height) override;
   void OnHostSelectedViewConfiguration(int width, int height) override;
   void setSmooth();
+  void layoutControls(IGraphics* g);
 
   double getY(double x, double min, double max);
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
@@ -137,6 +139,8 @@ public:
   void OnIdle() override;
   void OnReset() override;
   void OnParamChange(int paramIdx) override;
-  void layoutControls(IGraphics* g);
+  bool SerializeState(IByteChunk &chunk) const override;
+  int UnserializeState(const IByteChunk &chunk, int startPos) override;
+  void OnRestoreState() override;
 };
 
