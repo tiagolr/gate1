@@ -6,7 +6,7 @@ REM - zipping requires 7zip in %ProgramFiles%\7-Zip\7z.exe
 REM - building installer requires innotsetup in "%ProgramFiles(x86)%\Inno Setup 5\iscc"
 REM - AAX codesigning requires wraptool tool added to %PATH% env variable and aax.key/.crt in .\..\..\..\Certificates\
 
-if %1 == 1 (echo Making GATE2 Windows DEMO VERSION distribution ...) else (echo Making GATE2 Windows FULL VERSION distribution ...)
+if %1 == 1 (echo Making GATE1 Windows DEMO VERSION distribution ...) else (echo Making GATE1 Windows FULL VERSION distribution ...)
 
 echo "touching source"
 
@@ -49,21 +49,21 @@ REM -copy ".\resources\img\AboutBox_Registered.png" ".\resources\img\AboutBox.pn
 )
 
 REM - Could build individual targets like this:
-REM - msbuild GATE2-app.vcxproj /p:configuration=release /p:platform=win32
+REM - msbuild GATE1-app.vcxproj /p:configuration=release /p:platform=win32
 
 echo Building 32 bit binaries...
-msbuild GATE2.sln /p:configuration=release /p:platform=win32 /nologo /verbosity:minimal /fileLogger /m /flp:logfile=build-win.log;errorsonly 
+msbuild GATE1.sln /p:configuration=release /p:platform=win32 /nologo /verbosity:minimal /fileLogger /m /flp:logfile=build-win.log;errorsonly 
 
 echo Building 64 bit binaries...
-msbuild GATE2.sln /p:configuration=release /p:platform=x64 /nologo /verbosity:minimal /fileLogger /m /flp:logfile=build-win.log;errorsonly;append
+msbuild GATE1.sln /p:configuration=release /p:platform=x64 /nologo /verbosity:minimal /fileLogger /m /flp:logfile=build-win.log;errorsonly;append
 
 REM --echo Copying AAX Presets
 
 REM --echo ------------------------------------------------------------------
 REM --echo Code sign AAX binary...
 REM --info at pace central, login via iLok license manager https://www.paceap.com/pace-central.html
-REM --wraptool sign --verbose --account XXXXX --wcguid XXXXX --keyfile XXXXX.p12 --keypassword XXXXX --in .\build-win\aax\bin\GATE2.aaxplugin\Contents\Win32\GATE2.aaxplugin --out .\build-win\aax\bin\GATE2.aaxplugin\Contents\Win32\GATE2.aaxplugin
-REM --wraptool sign --verbose --account XXXXX --wcguid XXXXX --keyfile XXXXX.p12 --keypassword XXXXX --in .\build-win\aax\bin\GATE2.aaxplugin\Contents\x64\GATE2.aaxplugin --out .\build-win\aax\bin\GATE2.aaxplugin\Contents\x64\GATE2.aaxplugin
+REM --wraptool sign --verbose --account XXXXX --wcguid XXXXX --keyfile XXXXX.p12 --keypassword XXXXX --in .\build-win\aax\bin\GATE1.aaxplugin\Contents\Win32\GATE1.aaxplugin --out .\build-win\aax\bin\GATE1.aaxplugin\Contents\Win32\GATE1.aaxplugin
+REM --wraptool sign --verbose --account XXXXX --wcguid XXXXX --keyfile XXXXX.p12 --keypassword XXXXX --in .\build-win\aax\bin\GATE1.aaxplugin\Contents\x64\GATE1.aaxplugin --out .\build-win\aax\bin\GATE1.aaxplugin\Contents\x64\GATE1.aaxplugin
 
 REM - Make Installer (InnoSetup)
 
@@ -73,21 +73,21 @@ echo Making Installer ...
 if exist "%ProgramFiles(x86)%" (goto 64-Bit-is) else (goto 32-Bit-is)
 
 :32-Bit-is
-"%ProgramFiles%\Inno Setup 5\iscc" /Q /cc ".\installer\GATE2.iss"
+"%ProgramFiles%\Inno Setup 5\iscc" /Q /cc ".\installer\GATE1.iss"
 goto END-is
 
 :64-Bit-is
-"%ProgramFiles(x86)%\Inno Setup 5\iscc" /Q /cc ".\installer\GATE2.iss"
+"%ProgramFiles(x86)%\Inno Setup 5\iscc" /Q /cc ".\installer\GATE1.iss"
 goto END-is
 
 :END-is
 
 REM - Codesign Installer for Windows 8+
-REM -"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe" sign /f "XXXXX.p12" /p XXXXX /d "GATE2 Installer" ".\installer\GATE2 Installer.exe"
+REM -"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe" sign /f "XXXXX.p12" /p XXXXX /d "GATE1 Installer" ".\installer\GATE1 Installer.exe"
 
 REM -if %1 == 1 (
-REM -copy ".\installer\GATE2 Installer.exe" ".\installer\GATE2 Demo Installer.exe"
-REM -del ".\installer\GATE2 Installer.exe"
+REM -copy ".\installer\GATE1 Installer.exe" ".\installer\GATE1 Demo Installer.exe"
+REM -del ".\installer\GATE1 Installer.exe"
 REM -)
 
 REM - ZIP

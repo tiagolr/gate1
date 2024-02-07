@@ -11,7 +11,7 @@
 #include <vector>
 #include <mutex>
 
-class GATE2;  // Forward declaration
+class GATE1;  // Forward declaration
 
 struct Point {
     double x;
@@ -39,7 +39,7 @@ public:
     std::vector<Point> points;
     std::vector<Segment> segments;
 
-    Pattern(GATE2&, int);
+    Pattern(GATE1&, int);
     int insertPoint(double x, double y, double tension, int type);
     void removePoint(double x, double y);
     void removePoint(int i);
@@ -64,7 +64,7 @@ public:
     double get_y_at(double x);
 
 private:
-    GATE2& gate;
+    GATE1& gate;
     std::mutex mtx;
     double mod(double a, double b);
 };

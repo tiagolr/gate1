@@ -33,7 +33,7 @@ def main():
   print("update_version.py - setting version to " + config['FULL_VER_STR'])
   print("Updating plist version info...")
   
-  plistpath = scriptpath + "/resources/GATE2-VST2-Info.plist"
+  plistpath = scriptpath + "/resources/GATE1-VST2-Info.plist"
   with open(plistpath, 'rb') as fp:
     vst2 = plistlib.load(fp)
   vst2['CFBundleGetInfoString'] = CFBundleGetInfoString
@@ -43,7 +43,7 @@ def main():
     plistlib.dump(vst2, fp)
   replacestrs(plistpath, "//Apple//", "//Apple Computer//")
   
-  plistpath = scriptpath + "/resources/GATE2-AU-Info.plist"
+  plistpath = scriptpath + "/resources/GATE1-AU-Info.plist"
   with open(plistpath, 'rb') as fp:
     au = plistlib.load(fp)
   au['CFBundleGetInfoString'] = CFBundleGetInfoString
@@ -53,7 +53,7 @@ def main():
     plistlib.dump(au, fp)
   replacestrs(plistpath, "//Apple//", "//Apple Computer//")
   
-  plistpath = scriptpath + "/resources/GATE2-VST3-Info.plist"
+  plistpath = scriptpath + "/resources/GATE1-VST3-Info.plist"
   with open(plistpath, 'rb') as fp:
     vst3 = plistlib.load(fp)
   vst3['CFBundleGetInfoString'] = CFBundleGetInfoString
@@ -63,7 +63,7 @@ def main():
     plistlib.dump(vst3, fp)
   replacestrs(plistpath, "//Apple//", "//Apple Computer//")
   
-  plistpath = scriptpath + "/resources/GATE2-macOS-Info.plist"
+  plistpath = scriptpath + "/resources/GATE1-macOS-Info.plist"
   with open(plistpath, 'rb') as fp:
     app = plistlib.load(fp)
   app['CFBundleGetInfoString'] = CFBundleGetInfoString
@@ -72,7 +72,7 @@ def main():
   plistlib.writePlist(app, plistpath)
   replacestrs(plistpath, "//Apple//", "//Apple Computer//")
   
-  plistpath = scriptpath + "/resources/GATE2-AAX-Info.plist"
+  plistpath = scriptpath + "/resources/GATE1-AAX-Info.plist"
   with open(plistpath, 'rb') as fp:
     aax = plistlib.load(fp)
   aax['CFBundleGetInfoString'] = CFBundleGetInfoString
@@ -84,7 +84,7 @@ def main():
 
   print("Updating Mac Installer version info...")
   
-  plistpath = scriptpath + "/installer/GATE2.pkgproj"
+  plistpath = scriptpath + "/installer/GATE1.pkgproj"
   with open(plistpath, 'rb') as fp:
     installer = plistlib.load(fp)
   
@@ -97,7 +97,7 @@ def main():
   
   print("Updating Windows Installer version info...")
   
-  for line in fileinput.input(scriptpath + "/installer/GATE2.iss",inplace=1):
+  for line in fileinput.input(scriptpath + "/installer/GATE1.iss",inplace=1):
     if "AppVersion" in line:
       line="AppVersion=" + config['FULL_VER_STR'] + "\n"
     sys.stdout.write(line)

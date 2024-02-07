@@ -8,11 +8,11 @@
 */
 
 #include "Pattern.h"
-#include "GATE2.h"
+#include "GATE1.h"
 
 std::vector<Point> Pattern::copy_pattern;
 
-Pattern::Pattern(GATE2& p, int i) : gate(p)
+Pattern::Pattern(GATE1& p, int i) : gate(p)
 {
     index = i;
 };

@@ -5,10 +5,10 @@ void PlayButton::Draw(IGraphics& g)
 {
   IRECT r = mRECT.GetPadded(-2);
   if (GetValue() > 0.5) {
-    g.FillRect(GATE2::COLOR_ACTIVE, r);
+    g.FillRect(GATE1::COLOR_ACTIVE, r);
   }
   else {
-    g.FillTriangle(GATE2::COLOR_ACTIVE, r.L, r.T, r.R, (r.T + r.B) / 2, r.L, r.B);
+    g.FillTriangle(GATE1::COLOR_ACTIVE, r.L, r.T, r.R, (r.T + r.B) / 2, r.L, r.B);
   }
 }
 

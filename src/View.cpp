@@ -11,7 +11,7 @@
 #include "IControl.h"
 #include "IPlugTimer.h"
 
-View::View(const IRECT& bounds, GATE2& p) : IControl(bounds), gate(p)
+View::View(const IRECT& bounds, GATE1& p) : IControl(bounds), gate(p)
 {
 };
 
@@ -25,7 +25,7 @@ void View::OnResize() {
 void View::Draw(IGraphics& g) {
   if (gate.drawWave && (gate.alwaysPlaying || gate.isPlaying)) {
     drawWave(g, gate.preSamples, IColor(255, 127, 127, 127));
-    drawWave(g, gate.postSamples, GATE2::COLOR_ACTIVE);
+    drawWave(g, gate.postSamples, GATE1::COLOR_ACTIVE);
   }
   drawGrid(g);
   drawSegments(g);
@@ -134,27 +134,27 @@ void View::drawMidPoints(IGraphics& g)
   for (auto seg = segs.begin(); seg != segs.end(); ++seg) {
     if (!isCollinear(*seg)) {
       auto xy = getMidpointXY(*seg);
-      g.DrawCircle(GATE2::COLOR_ACTIVE, xy[0], xy[1], 3, 0, 2);
+      g.DrawCircle(GATE1::COLOR_ACTIVE, xy[0], xy[1], 3, 0, 2);
     }
   }
 
   if (selectedPoint == -1 && selectedMidpoint == -1 && hoverMidpoint != -1) {
     auto seg = segs[hoverMidpoint];
     auto xy = getMidpointXY(seg);
-    g.FillCircle(GATE2::COLOR_ACTIVE.WithOpacity(0.5), xy[0], xy[1], HOVER_RADIUS);
+    g.FillCircle(GATE1::COLOR_ACTIVE.WithOpacity(0.5), xy[0], xy[1], HOVER_RADIUS);
   }
 
   if (selectedMidpoint != -1) {
     auto seg = segs[selectedMidpoint];
     auto xy = getMidpointXY(seg);
-    g.FillCircle(GATE2::COLOR_ACTIVE, xy[0], xy[1], 3);
+    g.FillCircle(GATE1::COLOR_ACTIVE, xy[0], xy[1], 3);
   }
 }
 
 void View::drawSeek(IGraphics& g)
 {
-  g.DrawLine(GATE2::COLOR_SEEK.WithOpacity(0.5), gate.xpos * winw + winx, winy, gate.xpos * winw + winx, winy + winh);
-  g.DrawCircle(GATE2::COLOR_SEEK, gate.xpos * winw + winx, (1 - gate.ypos) * winh + winy, 5);
+  g.DrawLine(GATE1::COLOR_SEEK.WithOpacity(0.5), gate.xpos * winw + winx, winy, gate.xpos * winw + winx, winy + winh);
+  g.DrawCircle(GATE1::COLOR_SEEK, gate.xpos * winw + winx, (1 - gate.ypos) * winh + winy, 5);
 }
 
 int View::getHoveredPoint(int x, int y)

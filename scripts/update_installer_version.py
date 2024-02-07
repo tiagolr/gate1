@@ -62,9 +62,9 @@ def main():
       line="AppVersion=" + config['FULL_VER_STR'] + "\n"
     if "OutputBaseFilename" in line:
       if demo:
-        line="OutputBaseFilename=GATE2 Demo Installer\n"
+        line="OutputBaseFilename=GATE1 Demo Installer\n"
       else:
-        line="OutputBaseFilename=GATE2 Installer\n"
+        line="OutputBaseFilename=GATE1 Installer\n"
         
     if 'Source: "readme' in line:
      if demo:
@@ -74,15 +74,15 @@ def main():
     
     if "WelcomeLabel1" in line:
      if demo:
-       line="WelcomeLabel1=Welcome to the GATE2 Demo installer\n"
+       line="WelcomeLabel1=Welcome to the GATE1 Demo installer\n"
      else:
-       line="WelcomeLabel1=Welcome to the GATE2 installer\n"
+       line="WelcomeLabel1=Welcome to the GATE1 installer\n"
        
     if "SetupWindowTitle" in line:
      if demo:
-       line="SetupWindowTitle=GATE2 Demo installer\n"
+       line="SetupWindowTitle=GATE1 Demo installer\n"
      else:
-       line="SetupWindowTitle=GATE2 installer\n"
+       line="SetupWindowTitle=GATE1 installer\n"
        
     sys.stdout.write(line)
     

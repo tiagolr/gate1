@@ -253,8 +253,8 @@ sudo rm -R -f installer/build-mac/
 
 if [ $DEMO == 1 ]
 then
-git checkout installer/GATE2.iss
-git checkout installer/GATE2.pkgproj
+git checkout installer/GATE1.iss
+git checkout installer/GATE1.pkgproj
 git checkout resources/img/AboutBox.png
 fi
 

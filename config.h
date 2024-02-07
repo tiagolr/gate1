@@ -1,19 +1,19 @@
-#define PLUG_NAME "GATE2"
+#define PLUG_NAME "GATE1"
 #define PLUG_MFR "tilr"
 #define PLUG_VERSION_HEX 0x00010000
 #define PLUG_VERSION_STR "1.0.0"
-#define PLUG_UNIQUE_ID 'gt2'
+#define PLUG_UNIQUE_ID 'gt1'
 #define PLUG_MFR_ID 'tilr'
 #define PLUG_URL_STR "https://iplug2.github.io"
 #define PLUG_EMAIL_STR "spam@me.com"
-#define PLUG_COPYRIGHT_STR "Copyright 2020 tilr"
-#define PLUG_CLASS_NAME GATE2
+#define PLUG_COPYRIGHT_STR "Copyright 2024 tilr"
+#define PLUG_CLASS_NAME GATE1
 
-#define BUNDLE_NAME "GATE2"
+#define BUNDLE_NAME "GATE1"
 #define BUNDLE_MFR "tilr"
 #define BUNDLE_DOMAIN "com"
 
-#define SHARED_RESOURCES_SUBPATH "GATE2"
+#define SHARED_RESOURCES_SUBPATH "GATE1"
 
 #define PLUG_CHANNEL_IO "1-1 2-2"
 
@@ -34,16 +34,16 @@
 #define PLUG_MAX_WIDTH 8192
 #define PLUG_MAX_HEIGHT 8192
 
-#define AUV2_ENTRY GATE2_Entry
-#define AUV2_ENTRY_STR "GATE2_Entry"
-#define AUV2_FACTORY GATE2_Factory
-#define AUV2_VIEW_CLASS GATE2_View
-#define AUV2_VIEW_CLASS_STR "GATE2_View"
+#define AUV2_ENTRY GATE1_Entry
+#define AUV2_ENTRY_STR "GATE1_Entry"
+#define AUV2_FACTORY GATE1_Factory
+#define AUV2_VIEW_CLASS GATE1_View
+#define AUV2_VIEW_CLASS_STR "GATE1_View"
 
 #define AAX_TYPE_IDS 'IPRU'
 #define AAX_TYPE_IDS_AUDIOSUITE 'IPRA'
 #define AAX_PLUG_MFR_STR "Acme"
-#define AAX_PLUG_NAME_STR "GATE2\nIPEF"
+#define AAX_PLUG_NAME_STR "GATE1\nIPEF"
 #define AAX_PLUG_CATEGORY_STR "Effect"
 #define AAX_DOES_AUDIOSUITE 0
 

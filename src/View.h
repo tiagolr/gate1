@@ -8,10 +8,10 @@
 */
 
 #pragma once
-#include "GATE2.h"
+#include "GATE1.h"
 #include "IControl.h"
 
-//class GATE2; // Forward declaration
+//class GATE1; // Forward declaration
 
 class View : public IControl
 {
@@ -28,7 +28,7 @@ public:
   int rmousePoint = -1;
   const int HOVER_RADIUS = 8;
 
-  View(const IRECT&, GATE2&);
+  View(const IRECT&, GATE1&);
   void Draw(IGraphics& g) override;
   void OnResize() override;
   bool IsDirty() override {
@@ -56,7 +56,7 @@ public:
   void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override;
 
 private:
-  GATE2& gate;
+  GATE1& gate;
   double origTension = 0;
   int dragStartY = 0;
 

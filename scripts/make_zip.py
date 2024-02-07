@@ -15,16 +15,16 @@ def  main():
   else:
     demo=int(sys.argv[1])
    
-  installer = "\installer\GATE2 Installer.exe"
+  installer = "\installer\GATE1 Installer.exe"
    
   if demo:
-    installer = "\installer\GATE2 Demo Installer.exe"
+    installer = "\installer\GATE1 Demo Installer.exe"
    
   FILES_TO_ZIP = [
     projectpath + installer,
     projectpath + "\installer\changelog.txt",
     projectpath + "\installer\known-issues.txt",
-    projectpath + "\manual\GATE2 manual.pdf" 
+    projectpath + "\manual\GATE1 manual.pdf" 
   ]
 
   # extract values from config.h
@@ -43,10 +43,10 @@ def  main():
 
   FULLVERSIONSTR = MAJORSTR + "." + MINORSTR + "." + BUGFIXSTR
 
-  ZIPNAME = "GATE2-v" + FULLVERSIONSTR + "-win.zip"
+  ZIPNAME = "GATE1-v" + FULLVERSIONSTR + "-win.zip"
   
   if demo:
-    ZIPNAME = "GATE2-v" + FULLVERSIONSTR + "-win-demo.zip"
+    ZIPNAME = "GATE1-v" + FULLVERSIONSTR + "-win-demo.zip"
   
   zf = zipfile.ZipFile(projectpath + "\installer\/" + ZIPNAME, mode="w")
 

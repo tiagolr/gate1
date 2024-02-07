@@ -1,5 +1,5 @@
 #pragma once
-#include "GATE2.h"
+#include "GATE1.h"
 #include "IControls.h"
 
 class PlayButton : public IControl
@@ -13,12 +13,12 @@ public:
 class Preferences : public IVButtonControl
 {
 public:
-  Preferences(const IRECT& bounds, IActionFunction aF, const char* label, const IVStyle& style, GATE2& g)
+  Preferences(const IRECT& bounds, IActionFunction aF, const char* label, const IVStyle& style, GATE1& g)
     : IVButtonControl(bounds, aF, label, style), gate(g) {};
 
   void showPopupMenu();
   void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override;
 
 private:
-  GATE2& gate;
+  GATE1& gate;
 };
