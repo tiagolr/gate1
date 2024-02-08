@@ -95,7 +95,7 @@ void GATE1::makeControls(IGraphics* g)
   patternSwitches = new PatternSwitches(IRECT(), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle, EVShape::EndsRounded, EDirection::Horizontal);
   patternSwitches->SetTooltip("Pattern select");
   g->AttachControl(patternSwitches);
-  syncControl = new ICaptionControl(IRECT(), kSync, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
+  syncControl = new ICaptionControl(IRECT(), kSync, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE_DARK);
   syncControl->SetTooltip("Tempo sync");
   g->AttachControl(syncControl);
   rateControl = new Rotary(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
@@ -114,10 +114,10 @@ void GATE1::makeControls(IGraphics* g)
   g->AttachControl(releaseControl);
   tensionControl = new Rotary(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
   g->AttachControl(tensionControl);
-  pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
+  pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE_DARK);
   pointModeControl->SetTooltip("Point mode");
   g->AttachControl(pointModeControl);
-  paintModeControl = new ICaptionControl(IRECT(), kPaintMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE, true);
+  paintModeControl = new ICaptionControl(IRECT(), kPaintMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE_DARK, true);
   paintModeControl->SetTooltip("Paint mode (RMB)");
   g->AttachControl(paintModeControl);
   playControl = new PlayButton(IRECT(), [&](IControl* pCaller){
@@ -145,6 +145,11 @@ void GATE1::makeControls(IGraphics* g)
     preferencesControl->showPopupMenu();
     }, ". . .", numberStyle, *this);
   g->AttachControl(preferencesControl);
+  t = IText(16, COLOR_GRAY, "Roboto-Bold", EAlign::Near);
+  paintLabel = new ITextControl(IRECT(), "Paint", t);
+  pointLabel = new ITextControl(IRECT(), "Point", t);
+  g->AttachControl(paintLabel);
+  g->AttachControl(pointLabel);
 }
 
 void GATE1::layoutControls(IGraphics* g)
@@ -199,8 +204,12 @@ void GATE1::layoutControls(IGraphics* g)
   // third row left
   drawx = 10;
   drawy += 90;
+  paintLabel->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+40, drawy+20));
+  drawx += 42;
   paintModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
   drawx += 90;
+  pointLabel->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+40, drawy+20));
+  drawx += 42;
   pointModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
   drawx += 90;
   playControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20 , drawy+20));

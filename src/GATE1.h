@@ -125,6 +125,8 @@ public:
   IVToggleControl* snapControl;
   IVNumberBoxControl* gridNumber;
   IVToggleControl* midiModeControl;
+  ITextControl* paintLabel;
+  ITextControl* pointLabel;
 
   IVStyle rotaryStyle;
   IVStyle patternSwitchStyle;
