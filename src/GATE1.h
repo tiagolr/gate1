@@ -126,6 +126,13 @@ public:
   IVNumberBoxControl* gridNumber;
   IVToggleControl* midiModeControl;
 
+  IVStyle rotaryStyle;
+  IVStyle patternSwitchStyle;
+  IVStyle buttonStyle;
+  IVStyle numberStyle;
+
+  ISVG settingsSVG;
+
   GATE1(const InstanceInfo& info);
 
   void OnParentWindowResize(int width, int height) override;
@@ -133,6 +140,8 @@ public:
   void OnHostSelectedViewConfiguration(int width, int height) override;
   void setSmooth();
   void layoutControls(IGraphics* g);
+  void makeStyles();
+  void makeControls(IGraphics* g);
 
   double getY(double x, double min, double max);
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;

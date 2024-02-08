@@ -57,3 +57,6 @@
 
 #define ROBOTO_FN "Roboto-Regular.ttf"
 #define ROBOTO_BOLD_FN "Roboto-Bold.ttf"
+
+#define SETTINGS_SVG "icon-settings.svg"
+

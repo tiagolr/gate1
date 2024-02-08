@@ -40,6 +40,7 @@ public:
   Preferences(const IRECT& bounds, IActionFunction aF, const char* label, const IVStyle& style, GATE1& g)
     : IVButtonControl(bounds, aF, label, style), gate(g) {};
 
+  void Draw(IGraphics& g) override;
   void showPopupMenu();
   void OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) override;
 

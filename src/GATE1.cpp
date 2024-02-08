@@ -12,7 +12,8 @@ const IColor GATE1::COLOR_ACTIVE_DARK = IColor::FromColorCode(0x88442b);
 const IColor GATE1::COLOR_SEEK = IColor::FromColorCode(0x80FFFF);
 
 GATE1::GATE1(const InstanceInfo& info)
-: Plugin(info, MakeConfig(kNumParams, kNumPresets))
+: Plugin(info, MakeConfig(kNumParams, kNumPresets)),
+  settingsSVG(nullptr)
 {
   // init params
   GetParam(kPattern)->InitInt("Pattern", 1, 1, 12);
@@ -34,6 +35,7 @@ GATE1::GATE1(const InstanceInfo& info)
   preSamples.resize(PLUG_MAX_WIDTH, 0);
   postSamples.resize(PLUG_MAX_WIDTH, 0);
   value = new SmoothParam();
+  makeStyles();
 
   // init patterns
   for (int i = 0; i < 12; i++) {
@@ -61,134 +63,9 @@ GATE1::GATE1(const InstanceInfo& info)
     g->SetLayoutOnResize(true);
     g->LoadFont("Roboto-Regular", ROBOTO_FN);
     g->LoadFont("Roboto-Bold", ROBOTO_BOLD_FN);
+    settingsSVG = g->LoadSVG(SETTINGS_SVG);
 
-    //Create styles
-    IVColorSpec switchColors = {
-      COLOR_TRANSPARENT,
-      COLOR_ACTIVE_DARK,
-      COLOR_ACTIVE,
-      COLOR_BG,
-      COLOR_ACTIVE_LIGHT,
-      COLOR_WHITE,
-    };
-    IVStyle patternSwitchStyle = (new IVStyle())->WithColors(switchColors);
-    patternSwitchStyle.roundness = 0.5;
-    patternSwitchStyle.shadowOffset = 0;
-    patternSwitchStyle.valueText.mFGColor = COLOR_BG;
-    patternSwitchStyle.valueText = patternSwitchStyle.valueText.WithFont("Roboto-Bold");
-
-    IVColorSpec rotaryColors = {
-      COLOR_TRANSPARENT,
-      COLOR_BG,
-      COLOR_BG,
-      COLOR_ACTIVE,
-      COLOR_BG,
-      COLOR_BG,
-      COLOR_ACTIVE,
-    };
-    IVStyle rotaryStyle = (new IVStyle())->WithColors(rotaryColors);
-    rotaryStyle.frameThickness = 2;
-    rotaryStyle.shadowOffset = 0;
-    rotaryStyle.drawFrame = false;
-    rotaryStyle.valueText.mFGColor = COLOR_WHITE;
-    rotaryStyle.valueText = rotaryStyle.valueText.WithFont("Roboto-Bold");
-    rotaryStyle.labelText.mFGColor = COLOR_WHITE;
-    rotaryStyle.labelText.mSize = 16;
-    rotaryStyle.labelText = rotaryStyle.labelText.WithFont("Roboto-Bold");
-
-    IVColorSpec buttonColors = {
-      COLOR_TRANSPARENT,
-      COLOR_ACTIVE_DARK,
-      COLOR_ACTIVE,
-      COLOR_BG,
-      COLOR_TRANSPARENT,
-      COLOR_BG,
-    };
-    IVStyle buttonStyle = (new IVStyle())->WithColors(buttonColors);
-    buttonStyle.roundness = 0.25;
-    buttonStyle.showLabel = false;
-    buttonStyle.valueText.mFGColor = COLOR_BG;
-    buttonStyle.valueText.mSize = 16;
-    buttonStyle.valueText = buttonStyle.valueText.WithFont("Roboto-Bold");
-    buttonStyle.shadowOffset = 0;
-
-    IVColorSpec numberColors = {
-      COLOR_BG,
-      COLOR_BG,
-      COLOR_BG,
-      COLOR_BG,
-      COLOR_TRANSPARENT,
-    };
-    IVStyle numberStyle = (new IVStyle())->WithColors(numberColors);
-    numberStyle.shadowOffset = 0;
-    numberStyle.roundness = 0.5;
-    numberStyle.valueText.mFGColor = COLOR_ACTIVE;
-    numberStyle.valueText.mSize = 16;
-    numberStyle.valueText = numberStyle.valueText.WithFont("Roboto-Bold");
-    numberStyle.labelText.mFGColor = COLOR_ACTIVE;
-    numberStyle.labelText.mSize = 16;
-    numberStyle.labelText = numberStyle.labelText.WithFont("Roboto-Bold");
-
-    //Create controls
-    view = new View(IRECT(), *this);
-    g->AttachPanelBackground(COLOR_BG);
-    g->AttachControl(view);
-    auto t = IText(26, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
-    g->AttachControl(new ITextControl(IRECT(10,14,100,35), "GATE-1", t, true));
-    patternSwitches = new PatternSwitches(IRECT(), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle, EVShape::EndsRounded, EDirection::Horizontal);
-    patternSwitches->SetTooltip("Patterns");
-    g->AttachControl(patternSwitches);
-    syncControl = new ICaptionControl(IRECT(), kSync, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
-    syncControl->SetTooltip("Tempo sync");
-    g->AttachControl(syncControl);
-    rateControl = new Rotary(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(rateControl);
-    phaseControl = new Rotary(IRECT(), kPhase, "Phase", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(phaseControl);
-    minControl = new Rotary(IRECT(), kMin, "Min", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(minControl);
-    maxControl = new Rotary(IRECT(), kMax, "Max", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(maxControl);
-    smoothControl = new Rotary(IRECT(), kSmooth, "Smooth", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(smoothControl);
-    attackControl = new Rotary(IRECT(), kAttack, "Attack", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(attackControl);
-    releaseControl = new Rotary(IRECT(), kRelease, "Release", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(releaseControl);
-    tensionControl = new Rotary(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
-    g->AttachControl(tensionControl);
-    pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
-    pointModeControl->SetTooltip("Point mode");
-    g->AttachControl(pointModeControl);
-    paintModeControl = new ICaptionControl(IRECT(), kPaintMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
-    paintModeControl->SetTooltip("Paint mode (RMB)");
-    g->AttachControl(paintModeControl);
-    playControl = new PlayButton(IRECT(), [&](IControl* pCaller){
-      alwaysPlaying = !alwaysPlaying;
-      playControl->SetValue(alwaysPlaying ? 1 : 0);
-      playControl->SetDirty(false);
-    });
-    playControl->SetValue(alwaysPlaying ? 1 : 0);
-    playControl->SetTooltip("Always playing on/off");
-    g->AttachControl(playControl);
-    midiModeControl = new IVToggleControl(IRECT(), [&](IControl* pCaller) {
-      midiMode = !midiMode;
-      midiModeControl->SetValue(midiMode ? 1 : 0);
-      midiModeControl->SetDirty(false);
-    }, "", buttonStyle, "MIDI", "MIDI");
-    midiModeControl->SetValue(midiMode ? 1 : 0);
-    midiModeControl->SetTooltip("MIDI mode - use midi notes to trigger envelope");
-    g->AttachControl(midiModeControl);
-    snapControl = new IVToggleControl(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
-    g->AttachControl(snapControl);
-    t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
-    gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
-    g->AttachControl(gridNumber);
-    preferencesControl = new Preferences(IRECT(), [&](IControl* pCaller) {
-      preferencesControl->showPopupMenu();
-    }, ". . .", numberStyle, *this);
-    g->AttachControl(preferencesControl);
-
+    makeControls(g);
     inited = true;
     setSmooth();
     layoutControls(g);
@@ -208,6 +85,68 @@ void GATE1::setSmooth()
   }
 }
 
+void GATE1::makeControls(IGraphics* g)
+{
+  view = new View(IRECT(), *this);
+  g->AttachPanelBackground(COLOR_BG);
+  g->AttachControl(view);
+  auto t = IText(26, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
+  g->AttachControl(new ITextControl(IRECT(10,14,100,35), "GATE-1", t, true));
+  patternSwitches = new PatternSwitches(IRECT(), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle, EVShape::EndsRounded, EDirection::Horizontal);
+  patternSwitches->SetTooltip("Pattern select");
+  g->AttachControl(patternSwitches);
+  syncControl = new ICaptionControl(IRECT(), kSync, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
+  syncControl->SetTooltip("Tempo sync");
+  g->AttachControl(syncControl);
+  rateControl = new Rotary(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(rateControl);
+  phaseControl = new Rotary(IRECT(), kPhase, "Phase", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(phaseControl);
+  minControl = new Rotary(IRECT(), kMin, "Min", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(minControl);
+  maxControl = new Rotary(IRECT(), kMax, "Max", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(maxControl);
+  smoothControl = new Rotary(IRECT(), kSmooth, "Smooth", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(smoothControl);
+  attackControl = new Rotary(IRECT(), kAttack, "Attack", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(attackControl);
+  releaseControl = new Rotary(IRECT(), kRelease, "Release", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(releaseControl);
+  tensionControl = new Rotary(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
+  g->AttachControl(tensionControl);
+  pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE);
+  pointModeControl->SetTooltip("Point mode");
+  g->AttachControl(pointModeControl);
+  paintModeControl = new ICaptionControl(IRECT(), kPaintMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE, true);
+  paintModeControl->SetTooltip("Paint mode (RMB)");
+  g->AttachControl(paintModeControl);
+  playControl = new PlayButton(IRECT(), [&](IControl* pCaller){
+    alwaysPlaying = !alwaysPlaying;
+    playControl->SetValue(alwaysPlaying ? 1 : 0);
+    playControl->SetDirty(false);
+    });
+  playControl->SetValue(alwaysPlaying ? 1 : 0);
+  playControl->SetTooltip("Always playing on/off");
+  g->AttachControl(playControl);
+  midiModeControl = new IVToggleControl(IRECT(), [&](IControl* pCaller) {
+    midiMode = !midiMode;
+    midiModeControl->SetValue(midiMode ? 1 : 0);
+    midiModeControl->SetDirty(false);
+    }, "", buttonStyle, "MIDI", "MIDI");
+  midiModeControl->SetValue(midiMode ? 1 : 0);
+  midiModeControl->SetTooltip("MIDI mode - use midi notes to trigger envelope");
+  g->AttachControl(midiModeControl);
+  snapControl = new IVToggleControl(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
+  g->AttachControl(snapControl);
+  t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
+  gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
+  g->AttachControl(gridNumber);
+  preferencesControl = new Preferences(IRECT(), [&](IControl* pCaller) {
+    preferencesControl->showPopupMenu();
+    }, ". . .", numberStyle, *this);
+  g->AttachControl(preferencesControl);
+}
+
 void GATE1::layoutControls(IGraphics* g)
 {
   if (!inited)
@@ -218,18 +157,18 @@ void GATE1::layoutControls(IGraphics* g)
   view->SetTargetAndDrawRECTs(b.GetReducedFromTop(160));
 
   // first row left
-  int drawx = 100;
+  int drawx = 95;
   int drawy = 10;
   syncControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy + 3, drawx+80, drawy+20+3));
   drawx += 90;
   patternSwitches->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 250, drawy + 25));
 
   // first row right
-  drawx = b.R - 50;
-  preferencesControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy+10, drawx+40, drawy+25+10));
+  drawx = b.R - 35;
+  preferencesControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+25, drawy+25).GetPadded(-2.5).GetHShifted(2.5).GetVShifted(2.5));
 
   // second row left
-  drawy = 45;
+  drawy += 35;
   drawx = 0;
   rateControl->Hide(GetParam(kSync)->Value() > 0);
   if (!rateControl->IsHidden()) {
@@ -259,7 +198,7 @@ void GATE1::layoutControls(IGraphics* g)
 
   // third row left
   drawx = 10;
-  drawy = 135;
+  drawy += 90;
   paintModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
   drawx += 90;
   pointModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
@@ -267,13 +206,80 @@ void GATE1::layoutControls(IGraphics* g)
   playControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20 , drawy+20));
 
   // third row right
-  drawy = 132; // for some reason the alignment with the left side mismatches
+  drawy -= 3; // for some reason the alignment with the left side mismatches
   drawx = b.R - 10 - 60;
   midiModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 60, drawy + 25));
   drawx -= 65;
   snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+60, drawy+25));
   drawx -= 80;
   gridNumber->SetTargetAndDrawRECTs(IRECT(drawx+30, drawy+3, drawx+40+40, drawy+20+3));
+}
+
+void GATE1::makeStyles()
+{
+  //Create styles
+  patternSwitchStyle = (new IVStyle())->WithColors({
+    COLOR_TRANSPARENT,
+    COLOR_ACTIVE_DARK,
+    COLOR_ACTIVE,
+    COLOR_BG,
+    COLOR_TRANSPARENT,
+    COLOR_TRANSPARENT,
+    });
+  patternSwitchStyle.roundness = 0.5;
+  patternSwitchStyle.shadowOffset = 0;
+  patternSwitchStyle.frameThickness = 0;
+  patternSwitchStyle.valueText.mFGColor = COLOR_BG;
+  patternSwitchStyle.valueText = patternSwitchStyle.valueText.WithFont("Roboto-Bold");
+
+  rotaryStyle = (new IVStyle())->WithColors({
+    COLOR_TRANSPARENT,
+    COLOR_BG,
+    COLOR_BG,
+    COLOR_ACTIVE,
+    COLOR_BG,
+    COLOR_BG,
+    COLOR_ACTIVE,
+    });
+  rotaryStyle.frameThickness = 2;
+  rotaryStyle.shadowOffset = 0;
+  rotaryStyle.drawFrame = false;
+  rotaryStyle.valueText.mFGColor = COLOR_WHITE;
+  rotaryStyle.valueText = rotaryStyle.valueText.WithFont("Roboto-Bold");
+  rotaryStyle.labelText.mFGColor = COLOR_GRAY;
+  rotaryStyle.labelText.mSize = 16;
+  rotaryStyle.labelText = rotaryStyle.labelText.WithFont("Roboto-Bold");
+
+  buttonStyle = (new IVStyle())->WithColors({
+    COLOR_TRANSPARENT,
+    COLOR_ACTIVE_DARK,
+    COLOR_ACTIVE,
+    COLOR_BG,
+    COLOR_TRANSPARENT,
+    COLOR_BG,
+    });
+  buttonStyle.roundness = 0.25;
+  buttonStyle.showLabel = false;
+  buttonStyle.valueText.mFGColor = COLOR_BG;
+  buttonStyle.valueText.mSize = 16;
+  buttonStyle.valueText = buttonStyle.valueText.WithFont("Roboto-Bold");
+  buttonStyle.shadowOffset = 0;
+
+  numberStyle = (new IVStyle())->WithColors({
+    COLOR_TRANSPARENT,
+    COLOR_BG,
+    COLOR_BG,
+    COLOR_TRANSPARENT,
+    COLOR_TRANSPARENT,
+    });
+  numberStyle.shadowOffset = 0;
+  numberStyle.roundness = 0.5;
+  numberStyle.valueText.mFGColor = COLOR_ACTIVE;
+  numberStyle.valueText.mSize = 16;
+  numberStyle.valueText = numberStyle.valueText.WithFont("Roboto-Bold");
+  numberStyle.labelText.mFGColor = COLOR_ACTIVE;
+  numberStyle.labelText.mSize = 16;
+  numberStyle.labelText = numberStyle.labelText.WithFont("Roboto-Bold");
 }
 
 void GATE1::OnParamChange(int paramIdx)

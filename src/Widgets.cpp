@@ -42,6 +42,11 @@ void PlayButton::OnMouseDown(float x, float y, const IMouseMod& mod)
   SetDirty(true);
 }
 
+void Preferences::Draw(IGraphics& g)
+{
+  g.DrawSVG(gate.settingsSVG, mRECT,0, &COLOR_TRANSPARENT, &GATE1::COLOR_ACTIVE);
+}
+
 void Preferences::showPopupMenu()
 {
   IPopupMenu* menu = new IPopupMenu();

@@ -451,4 +451,7 @@
       <Filter>config</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\GATE1.ico" />
+  </ItemGroup>
 </Project>
