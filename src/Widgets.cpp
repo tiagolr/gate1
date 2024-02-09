@@ -149,7 +149,7 @@ void Preferences::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) {
   }
   else if (strcmp(text, "Dual smooth") == 0) {
     gate.dualSmooth = !gate.dualSmooth;
-    gate.layoutControls(gate.GetUI());
+    gate.dirtyControls = true;
     gate.setSmooth();
   }
   else if (strcmp(text, "Link edge points") == 0) {

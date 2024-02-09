@@ -85,11 +85,12 @@ public:
   bool alwaysPlaying = false;
   bool midiMode = false;
   // state
-  int winw = PLUG_WIDTH; // quick and dirty fix for referencing view width during process block (instance may be voided), set by view::onResize
+  bool dirtyControls = false; // used to re-layout components during Idle(), avoids crashes when laying out components directly
+  int winw = PLUG_WIDTH; // quick fix for referencing view width during process block, set by view::onResize
   bool inited = false;
   bool isPlaying = false;
   bool snap = false;
-  bool midiTrigger = false; // trigger via midi or slider is active
+  bool midiTrigger = false; // trigger envelope via midi notes
   int gridSegs = 8;
   double tensionMult = 0;
   double syncQN = 0;

@@ -297,7 +297,7 @@ void GATE1::OnParamChange(int paramIdx)
     pattern = patterns[(int)GetParam(kPattern)->Value() - 1];
   }
   else if (paramIdx == kSync) {
-    layoutControls(GetUI());
+    dirtyControls = true;
     auto sync = GetParam(kSync)->Value();
     if (sync == 0) syncQN = 0;
     if (sync == 1) syncQN = 1./4.; // 1/16
@@ -399,7 +399,7 @@ void GATE1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 
   if (!midiMode && (isPlaying || alwaysPlaying)) {
     for (int s = 0; s < nFrames; ++s) {
-      if (sync > 0) {
+      if (sync > 0 && syncQN > 0) { // syncQN > 0 avoids crash where user changes rate mid processBlock
         beatPos += beatsPerSpl;
         xpos = beatPos / syncQN + phase;
       }
@@ -500,6 +500,12 @@ void GATE1::OnReset()
 
 void GATE1::OnIdle()
 {
+  if (dirtyControls && GetUI()) {
+    dirtyControls = false;
+    auto g = GetUI();
+    layoutControls(g);
+    g->SetAllControlsDirty(); // FIX - erases extra drawn knob
+  }
 }
 
 bool GATE1::SerializeState(IByteChunk &chunk) const
@@ -567,11 +573,5 @@ int GATE1::UnserializeState(const IByteChunk &chunk, int startPos)
 void GATE1::OnRestoreState() {
   SendCurrentParamValuesFromDelegate();
   setSmooth();
-
-  // FIX - erases extra drawn knob
-  auto g = GetUI();
-  if (g) {
-    g->Resize(g->WindowWidth() + 1, g->WindowHeight() + 1, 1.f, true);
-    g->Resize(g->WindowWidth() - 1, g->WindowHeight() - 1, 1.f, true);
-  }
+  dirtyControls = true;
 };
