@@ -4,8 +4,8 @@
 #define PLUG_VERSION_STR "1.0.0"
 #define PLUG_UNIQUE_ID 'gt1'
 #define PLUG_MFR_ID 'tilr'
-#define PLUG_URL_STR "https://iplug2.github.io"
-#define PLUG_EMAIL_STR "spam@me.com"
+#define PLUG_URL_STR "https://github.com/tiagolr/gate1"
+#define PLUG_EMAIL_STR "tlcnr88@gmail.com"
 #define PLUG_COPYRIGHT_STR "Copyright 2024 tilr"
 #define PLUG_CLASS_NAME GATE1
 

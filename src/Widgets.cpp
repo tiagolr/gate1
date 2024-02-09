@@ -189,4 +189,56 @@ void Preferences::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) {
     gate.pattern->reverse();
     gate.pattern->buildSegments();
   }
+  else if (strcmp(text, "About") == 0) {
+    gate.aboutControl->Hide(false);
+  }
+}
+
+void About::OnAttached()
+{
+  title = new ITextControl(IRECT(), PLUG_NAME, IText(25, COLOR_WHITE, "Roboto-Bold"));
+  version = new ITextControl(IRECT(), PLUG_VERSION_STR, IText(16, COLOR_WHITE, "Roboto-Bold"));
+  url = new IURLControl(IRECT(), "Github", PLUG_URL_STR, IText(16, COLOR_WHITE, "Roboto-Bold"));
+  auto text = std::string("");
+  text += PLUG_COPYRIGHT_STR;
+  text += "\n\nToggle patterns 1-12 by sending midi notes on chn 10 (default)\n";
+  text += "Left click - move points or set tension\n";
+  text += "Right click - paint mode\n";
+  text += "Double click - remove or add points\n";
+  text += "Alt right click - erase mode\n";
+  text += "Control - toggle snapping\n";
+  text += "Mouse wheel - set grid\n";
+  
+  multiline = new IMultiLineTextControl(IRECT(), text.c_str(), IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Center, EVAlign::Top));
+  AddChildControl(title);
+  AddChildControl(version);
+  AddChildControl(url);
+  AddChildControl(multiline);
+
+  layoutComponents();
+}
+
+void About::OnMouseDown(float x, float y, const IMouseMod& mod)
+{
+  GetActionFunction()(this);
+}
+
+void About::Draw(IGraphics& g)
+{
+  g.FillRect(COLOR_BLACK.WithOpacity(0.75), mRECT);
+}
+
+void About::OnResize()
+{
+  if (mChildren.GetSize()) {
+    layoutComponents();
+  }
+};
+
+void About::layoutComponents()
+{
+  title->SetTargetAndDrawRECTs(mRECT.GetPadded(-100).GetFromTop(25));
+  version->SetTargetAndDrawRECTs(title->GetRECT().GetVShifted(25));
+  url->SetTargetAndDrawRECTs(version->GetRECT().GetVShifted(25));
+  multiline->SetTargetAndDrawRECTs(IRECT(0,190,500,400).GetHAlignedTo(mRECT, EAlign::Center));
 }

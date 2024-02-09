@@ -150,6 +150,11 @@ void GATE1::makeControls(IGraphics* g)
   pointLabel = new ITextControl(IRECT(), "Point", t);
   g->AttachControl(paintLabel);
   g->AttachControl(pointLabel);
+  aboutControl = new About(g->GetBounds(), [](IControl* pCaller) {
+    pCaller->Hide(true);
+  });
+  g->AttachControl(aboutControl);
+  aboutControl->Hide(true);
 }
 
 void GATE1::layoutControls(IGraphics* g)
@@ -159,7 +164,7 @@ void GATE1::layoutControls(IGraphics* g)
 
   const IRECT b = g->GetBounds();
   g->GetBackgroundControl()->SetTargetAndDrawRECTs(b);
-  view->SetTargetAndDrawRECTs(b.GetReducedFromTop(160));
+  view->SetTargetAndDrawRECTs(b.GetReducedFromTop(158));
 
   // first row left
   int drawx = 95;
@@ -221,6 +226,8 @@ void GATE1::layoutControls(IGraphics* g)
   snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+60, drawy+20));
   drawx -= 85;
   gridNumber->SetTargetAndDrawRECTs(IRECT(drawx+30, drawy, drawx+40+40, drawy+20));
+
+  aboutControl->SetTargetAndDrawRECTs(b);
 }
 
 void GATE1::makeStyles()

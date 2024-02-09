@@ -69,3 +69,20 @@ public:
 private:
   GATE1& gate;
 };
+
+class About : public IContainerBase
+{
+public:
+  About(const IRECT& bounds, IActionFunction af) : IContainerBase(bounds, af) {};
+
+  ITextControl* title;
+  ITextControl* version;
+  IURLControl* url;
+  IMultiLineTextControl* multiline;
+
+  void OnMouseDown(float x, float y, const IMouseMod& mod) override;
+  void OnAttached() override;
+  void Draw(IGraphics& g) override;
+  void OnResize() override;
+  void layoutComponents();
+};

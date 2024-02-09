@@ -41,6 +41,7 @@ class Rotary;
 class PatternSwitches;
 class Button;
 class Caption;
+class About;
 
 using namespace iplug;
 using namespace igraphics;
@@ -129,6 +130,7 @@ public:
   Button* snapControl;
   IVNumberBoxControl* gridNumber;
   Button* midiModeControl;
+  About* aboutControl;
   ITextControl* paintLabel;
   ITextControl* pointLabel;
 
