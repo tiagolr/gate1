@@ -1,6 +1,52 @@
 #include "Widgets.h"
 #include <string>
 
+void Caption::Draw(IGraphics& g)
+{
+  const IParam* pParam = GetParam();
+
+  if(pParam)
+  {
+    pParam->GetDisplay(mStr);
+
+    if (mShowParamLabel)
+    {
+      mStr.Append(" ");
+      mStr.Append(pParam->GetLabel());
+    }
+  }
+
+  g.DrawRoundRect(GATE1::COLOR_ACTIVE, mRECT, 2.5);
+
+  if (mStr.GetLength() && g.GetControlInTextEntry() != this)
+    g.DrawText(mText, mStr.Get(), mRECT, &mBlend);
+
+  if(mTri.W() > 0.f)
+  {
+    g.FillTriangle(GATE1::COLOR_ACTIVE, mTri.L, mTri.T, mTri.R, mTri.T, mTri.MW(), mTri.B, GetMouseIsOver() ? 0 : &BLEND_50);
+  }
+}
+
+void Button::DrawWidget(IGraphics& g)
+{
+  if (GetValue() > 0.5)
+    g.FillRoundRect(GATE1::COLOR_ACTIVE, mWidgetBounds, 2.5);
+  else
+    g.DrawRoundRect(GATE1::COLOR_ACTIVE, mWidgetBounds, 2.5);
+}
+
+void Button::DrawValue(IGraphics& g, bool mouseOver)
+{
+  if(GetValue() > 0.5) {
+    mStyle.valueText.mFGColor = GATE1::COLOR_BG;
+    g.DrawText(mStyle.valueText, mOnText.Get(), mValueBounds, &mBlend);
+  }
+  else {
+    mStyle.valueText.mFGColor = GATE1::COLOR_ACTIVE;
+    g.DrawText(mStyle.valueText, mOffText.Get(), mValueBounds, &mBlend);
+  }
+}
+
 void Rotary::DrawWidget(IGraphics& g)
 {
   float widgetRadius = GetRadius() - 2;

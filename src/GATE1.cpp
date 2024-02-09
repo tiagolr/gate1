@@ -95,7 +95,7 @@ void GATE1::makeControls(IGraphics* g)
   patternSwitches = new PatternSwitches(IRECT(), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle, EVShape::EndsRounded, EDirection::Horizontal);
   patternSwitches->SetTooltip("Pattern select");
   g->AttachControl(patternSwitches);
-  syncControl = new ICaptionControl(IRECT(), kSync, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE_DARK);
+  syncControl = new Caption(IRECT(), kSync, IText(16.f, COLOR_ACTIVE, "Roboto-Bold"), COLOR_ACTIVE_DARK);
   syncControl->SetTooltip("Tempo sync");
   g->AttachControl(syncControl);
   rateControl = new Rotary(IRECT(), kRate, "Rate", rotaryStyle, true, false, -135.f, 135.f, -135.f, EDirection::Vertical, 2.0, 4.0);
@@ -114,10 +114,10 @@ void GATE1::makeControls(IGraphics* g)
   g->AttachControl(releaseControl);
   tensionControl = new Rotary(IRECT(), kTension, "Tension", rotaryStyle, true, false, -135.f, 135.f, 0.f, EDirection::Vertical, 2.0, 4.0);
   g->AttachControl(tensionControl);
-  pointModeControl = new ICaptionControl(IRECT(), kPointMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE_DARK);
+  pointModeControl = new Caption(IRECT(), kPointMode, IText(16.f, COLOR_ACTIVE, "Roboto-Bold"), COLOR_ACTIVE_DARK);
   pointModeControl->SetTooltip("Point mode");
   g->AttachControl(pointModeControl);
-  paintModeControl = new ICaptionControl(IRECT(), kPaintMode, IText(16.f, COLOR_BG, "Roboto-Bold"), COLOR_ACTIVE_DARK, true);
+  paintModeControl = new Caption(IRECT(), kPaintMode, IText(16.f, COLOR_ACTIVE, "Roboto-Bold"), COLOR_ACTIVE_DARK, true);
   paintModeControl->SetTooltip("Paint mode (RMB)");
   g->AttachControl(paintModeControl);
   playControl = new PlayButton(IRECT(), [&](IControl* pCaller){
@@ -128,7 +128,7 @@ void GATE1::makeControls(IGraphics* g)
   playControl->SetValue(alwaysPlaying ? 1 : 0);
   playControl->SetTooltip("Always playing on/off");
   g->AttachControl(playControl);
-  midiModeControl = new IVToggleControl(IRECT(), [&](IControl* pCaller) {
+  midiModeControl = new Button(IRECT(), [&](IControl* pCaller) {
     midiMode = !midiMode;
     midiModeControl->SetValue(midiMode ? 1 : 0);
     midiModeControl->SetDirty(false);
@@ -136,7 +136,7 @@ void GATE1::makeControls(IGraphics* g)
   midiModeControl->SetValue(midiMode ? 1 : 0);
   midiModeControl->SetTooltip("MIDI mode - use midi notes to trigger envelope");
   g->AttachControl(midiModeControl);
-  snapControl = new IVToggleControl(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
+  snapControl = new Button(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
   g->AttachControl(snapControl);
   t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
   gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
@@ -166,7 +166,7 @@ void GATE1::layoutControls(IGraphics* g)
   int drawy = 10;
   syncControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy + 3, drawx+80, drawy+20+3));
   drawx += 90;
-  patternSwitches->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 250, drawy + 25));
+  patternSwitches->SetTargetAndDrawRECTs(IRECT(drawx, drawy+3, drawx + 250, drawy + 20+3));
 
   // first row right
   drawx = b.R - 35;
@@ -212,16 +212,15 @@ void GATE1::layoutControls(IGraphics* g)
   drawx += 42;
   pointModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
   drawx += 90;
-  playControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20 , drawy+20));
+  playControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20 , drawy+20).GetPadded(-1));
 
   // third row right
-  drawy -= 3; // for some reason the alignment with the left side mismatches
-  drawx = b.R - 10 - 60;
-  midiModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 60, drawy + 25));
-  drawx -= 65;
-  snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+60, drawy+25));
-  drawx -= 80;
-  gridNumber->SetTargetAndDrawRECTs(IRECT(drawx+30, drawy+3, drawx+40+40, drawy+20+3));
+  drawx = b.R - 70;
+  midiModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 60, drawy + 20));
+  drawx -= 70;
+  snapControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+60, drawy+20));
+  drawx -= 85;
+  gridNumber->SetTargetAndDrawRECTs(IRECT(drawx+30, drawy, drawx+40+40, drawy+20));
 }
 
 void GATE1::makeStyles()
@@ -236,8 +235,8 @@ void GATE1::makeStyles()
     COLOR_TRANSPARENT,
     });
   patternSwitchStyle.roundness = 0.5;
-  patternSwitchStyle.shadowOffset = 0;
-  patternSwitchStyle.frameThickness = 0;
+  patternSwitchStyle.drawShadows = false;
+  patternSwitchStyle.drawFrame = false;
   patternSwitchStyle.valueText.mFGColor = COLOR_BG;
   patternSwitchStyle.valueText = patternSwitchStyle.valueText.WithFont("Roboto-Bold");
 
@@ -251,8 +250,8 @@ void GATE1::makeStyles()
     COLOR_ACTIVE,
     });
   rotaryStyle.frameThickness = 2;
-  rotaryStyle.shadowOffset = 0;
   rotaryStyle.drawFrame = false;
+  rotaryStyle.drawShadows = false;
   rotaryStyle.valueText.mFGColor = COLOR_WHITE;
   rotaryStyle.valueText = rotaryStyle.valueText.WithFont("Roboto-Bold");
   rotaryStyle.labelText.mFGColor = COLOR_GRAY;
@@ -268,11 +267,12 @@ void GATE1::makeStyles()
     COLOR_BG,
     });
   buttonStyle.roundness = 0.25;
+  buttonStyle.drawShadows = false;
+  buttonStyle.drawFrame = false;
   buttonStyle.showLabel = false;
   buttonStyle.valueText.mFGColor = COLOR_BG;
   buttonStyle.valueText.mSize = 16;
   buttonStyle.valueText = buttonStyle.valueText.WithFont("Roboto-Bold");
-  buttonStyle.shadowOffset = 0;
 
   numberStyle = (new IVStyle())->WithColors({
     COLOR_TRANSPARENT,
@@ -317,7 +317,6 @@ void GATE1::OnParamChange(int paramIdx)
     if (sync == 15) syncQN = 1./1.*1.5; // 1/4.
     if (sync == 16) syncQN = 2./1.*1.5; // 1/2.
     if (sync == 17) syncQN = 4./1.*1.5; // 1/1.
-    DBGMSG("SYNC %.2f QN %.2f\n", sync, syncQN);
   }
   else if (paramIdx == kGrid) {
     gridSegs = (int)GetParam(kGrid)->Value();
@@ -374,7 +373,7 @@ void GATE1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   double nextValue;
 
   auto processDisplaySamples = [&](int s) {
-    winpos = std::floor(xpos * view->winw);
+    winpos = std::floor(xpos * winw);
     if (lwinpos != winpos) {
       preSamples[winpos] = 0;
       postSamples[winpos] = 0;

@@ -20,6 +20,7 @@ void View::OnResize() {
   winy = mRECT.T + 10;
   winw = mRECT.W() - 20;
   winh = mRECT.H() - 20;
+  gate.winw = (int)std::max(winw, PLUG_MIN_WIDTH);
 }
 
 void View::Draw(IGraphics& g) {

@@ -39,6 +39,8 @@ class Preferences;
 class PlayButton;
 class Rotary;
 class PatternSwitches;
+class Button;
+class Caption;
 
 using namespace iplug;
 using namespace igraphics;
@@ -83,6 +85,7 @@ public:
   bool alwaysPlaying = false;
   bool midiMode = false;
   // state
+  int winw = PLUG_WIDTH; // quick and dirty fix for referencing view width during process block (instance may be voided), set by view::onResize
   bool inited = false;
   bool isPlaying = false;
   bool snap = false;
@@ -109,7 +112,7 @@ public:
   Pattern* patterns[12];
   View* view;
   PatternSwitches* patternSwitches;
-  ICaptionControl* syncControl;
+  Caption* syncControl;
   Preferences* preferencesControl;
   Rotary* rateControl;
   Rotary* phaseControl;
@@ -119,12 +122,12 @@ public:
   Rotary* attackControl;
   Rotary* releaseControl;
   Rotary* tensionControl;
-  ICaptionControl* pointModeControl;
-  ICaptionControl* paintModeControl;
+  Caption* pointModeControl;
+  Caption* paintModeControl;
   PlayButton* playControl;
-  IVToggleControl* snapControl;
+  Button* snapControl;
   IVNumberBoxControl* gridNumber;
-  IVToggleControl* midiModeControl;
+  Button* midiModeControl;
   ITextControl* paintLabel;
   ITextControl* pointLabel;
 

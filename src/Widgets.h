@@ -2,6 +2,28 @@
 #include "GATE1.h"
 #include "IControls.h"
 
+class Caption : public ICaptionControl
+{
+public:
+  Caption(const IRECT& bounds, int paramIdx, const IText& text, const IColor& bgColor, bool showParamLabel = false)
+    : ICaptionControl(bounds, paramIdx, text, bgColor, showParamLabel) {};
+
+  void Draw(IGraphics& g) override;
+};
+
+class Button : public IVToggleControl
+{
+public:
+  Button(const IRECT& bounds, int paramIdx, const char* label, const IVStyle& style, const char* offText, const char* onText)
+    : IVToggleControl(bounds, paramIdx, label, style, offText, onText) {};
+
+  Button(const IRECT& bounds, IActionFunction aF, const char* label, const IVStyle& style, const char* offText, const char* onText)
+    : IVToggleControl(bounds, aF, label, style, offText, onText) {};
+
+  void DrawWidget(IGraphics& g) override;
+  void DrawValue(IGraphics& g, bool mouseOver) override;
+};
+
 class Rotary : public IVKnobControl
 {
 public:
