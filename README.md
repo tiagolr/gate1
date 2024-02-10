@@ -1,3 +1,3 @@
 # GATE1
 
-![](doc/distr.png)
+![](doc/gate1.png)
