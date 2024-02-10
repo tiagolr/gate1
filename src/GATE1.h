@@ -130,6 +130,7 @@ public:
   Button* snapControl;
   IVNumberBoxControl* gridNumber;
   Button* midiModeControl;
+  Button* retriggerControl;
   About* aboutControl;
   ITextControl* paintLabel;
   ITextControl* pointLabel;
@@ -160,5 +161,7 @@ public:
   bool SerializeState(IByteChunk &chunk) const override;
   int UnserializeState(const IByteChunk &chunk, int startPos) override;
   void OnRestoreState() override;
+  bool canRetrigger();
+  void retriggerEnvelope();
 };
 

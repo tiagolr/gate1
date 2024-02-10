@@ -150,6 +150,13 @@ void GATE1::makeControls(IGraphics* g)
   pointLabel = new ITextControl(IRECT(), "Point", t);
   g->AttachControl(paintLabel);
   g->AttachControl(pointLabel);
+  retriggerControl = new Button(IRECT(), [&](IControl* pCaller) {
+    retriggerEnvelope();
+    retriggerControl->SetValue(0);
+    retriggerControl->SetDirty(false);
+  }, "", buttonStyle, "R", "R");
+  retriggerControl->SetTooltip("Retrigger envelope");
+  g->AttachControl(retriggerControl);
   aboutControl = new About(g->GetBounds(), [](IControl* pCaller) {
     pCaller->Hide(true);
   });
@@ -218,6 +225,8 @@ void GATE1::layoutControls(IGraphics* g)
   pointModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
   drawx += 90;
   playControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20 , drawy+20).GetPadded(-1));
+  drawx += 30;
+  retriggerControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20, drawy + 20));
 
   // third row right
   drawx = b.R - 70;
@@ -337,6 +346,9 @@ void GATE1::OnParamChange(int paramIdx)
   else if (paramIdx == kAttack || paramIdx == kRelease || paramIdx == kSmooth) {
     setSmooth();
   }
+  else if (paramIdx == kRetrigger && GetParam(kRetrigger)->Value() == 1 && canRetrigger()) {
+    retriggerEnvelope();
+  }
 }
 
 void GATE1::OnParentWindowResize(int width, int height)
@@ -354,6 +366,21 @@ void GATE1::OnHostSelectedViewConfiguration(int width, int height)
 {
   if (GetUI())
     GetUI()->Resize(width, height, 1.f, true);
+}
+
+bool GATE1::canRetrigger()
+{
+  bool isSync = GetParam(kSync)->Value() > 0;
+  return !midiMode && (!isSync && (alwaysPlaying || isPlaying)) || (alwaysPlaying && !isPlaying);
+}
+
+void GATE1::retriggerEnvelope()
+{
+  double phase = GetParam(kPhase)->Value();
+  if (GetParam(kSync)->Value() > 0)
+    beatPos = -phase * syncQN;
+  else 
+    beatPos = -phase;
 }
 
 double inline GATE1::getY(double x, double min, double max)
@@ -507,11 +534,14 @@ void GATE1::OnReset()
 
 void GATE1::OnIdle()
 {
-  if (dirtyControls && GetUI()) {
+  auto g = GetUI();
+  if (dirtyControls && g) {
     dirtyControls = false;
-    auto g = GetUI();
     layoutControls(g);
     g->SetAllControlsDirty(); // FIX - erases extra drawn knob
+  }
+  if (g && canRetrigger() != !retriggerControl->IsHidden()) {
+    retriggerControl->Hide(!canRetrigger());
   }
 }
 
