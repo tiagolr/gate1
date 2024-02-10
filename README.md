@@ -2,7 +2,7 @@
 
 GATE1 is an envelope generator for gate/volume control. It is a port of [GATE-1 JSFX](https://github.com/tiagolr/tilr_jsfx?tab=readme-ov-file#gate-1) to C++ using [Iplug2](https://iplug2.github.io/)
 
-[Download VST3](https://github.com/tiagolr/gate1/raw/master/dist/GATE1.vst3)
+* [Download VST3](https://github.com/tiagolr/gate1/raw/master/dist/GATE1.vst3)
 
 ![](doc/gate1.png)
 
