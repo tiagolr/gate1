@@ -250,7 +250,7 @@ void GATE1::makeStyles()
     COLOR_TRANSPARENT,
     COLOR_TRANSPARENT,
     });
-  patternSwitchStyle.roundness = 0.5;
+  patternSwitchStyle.roundness = 0.25;
   patternSwitchStyle.drawShadows = false;
   patternSwitchStyle.drawFrame = false;
   patternSwitchStyle.valueText.mFGColor = COLOR_BG;
