@@ -42,6 +42,7 @@ class PatternSwitches;
 class Button;
 class Caption;
 class About;
+class NumberControl;
 
 using namespace iplug;
 using namespace igraphics;
@@ -128,7 +129,7 @@ public:
   Caption* paintModeControl;
   PlayButton* playControl;
   Button* snapControl;
-  IVNumberBoxControl* gridNumber;
+  NumberControl* gridNumber;
   Button* midiModeControl;
   Button* retriggerControl;
   About* aboutControl;

@@ -139,7 +139,7 @@ void GATE1::makeControls(IGraphics* g)
   snapControl = new Button(IRECT(), kSnap, " ", buttonStyle, "Snap", "Snap");
   g->AttachControl(snapControl);
   t = IText(16, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
-  gridNumber = new IVNumberBoxControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
+  gridNumber = new NumberControl(IRECT(), kGrid, nullptr, "", numberStyle, false, 8, 2, 32, "Grid %0.f", false);
   g->AttachControl(gridNumber);
   preferencesControl = new Preferences(IRECT(), [&](IControl* pCaller) {
     preferencesControl->showPopupMenu();

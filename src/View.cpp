@@ -41,7 +41,7 @@ void View::drawWave(IGraphics& g, std::vector<sample> samples, IColor color)
 {
   double lastX = winx;
   double lastY = winh - std::min(std::abs(samples[0]),1.) * winh + winy;
-  color = color.WithOpacity(0.4);
+  color = color.WithOpacity(0.4f);
   for (int i = 0; i < winw; ++i) {
     double ypos = std::min(samples[i], 1.);
     g.DrawLine(ypos == 0 ? COLOR_TRANSPARENT : color, i + winx, winy + winh, i + winx, winh - ypos * winh + winy);

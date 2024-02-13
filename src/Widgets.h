@@ -2,6 +2,16 @@
 #include "GATE1.h"
 #include "IControls.h"
 
+class NumberControl : public IVNumberBoxControl
+{
+public:
+  NumberControl(const IRECT& bounds, int paramIdx = kNoParameter, IActionFunction actionFunc = nullptr, const char* label = "", const IVStyle& style = DEFAULT_STYLE, bool buttons = false, double defaultValue = 50.f, double minValue = 1.f, double maxValue = 100.f, const char* fmtStr = "%0.0f", bool drawTriangle = true)
+    :IVNumberBoxControl(bounds, paramIdx, actionFunc, label, style, buttons, defaultValue, minValue, maxValue, fmtStr, drawTriangle)
+  {
+    mLargeIncrement = 0.1f;
+  };
+};
+
 class Caption : public ICaptionControl
 {
 public:
