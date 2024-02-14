@@ -1,8 +1,6 @@
 #pragma once
 
 #include "IPlug_include_in_plug_hdr.h"
-#include "Oscillator.h"
-#include "ISender.h"
 #include "IControls.h"
 #include "Pattern.h"
 
