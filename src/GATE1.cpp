@@ -488,6 +488,14 @@ void GATE1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       }
     }
   }
+
+  else { // FIX Fl studio sound issues on stop play
+    for (int s = 0; s < nFrames; ++s) {
+      for (int c = 0; c < nChans; ++c) {
+        outputs[c][s] = inputs[c][s];
+      }
+    }
+  }
 }
 
 void GATE1::ProcessMidiMsg(const IMidiMsg& msg)

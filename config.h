@@ -1,7 +1,7 @@
 #define PLUG_NAME "GATE1"
 #define PLUG_MFR "tilr"
-#define PLUG_VERSION_HEX 0x00010002
-#define PLUG_VERSION_STR "1.0.2"
+#define PLUG_VERSION_HEX 0x00010003
+#define PLUG_VERSION_STR "1.0.3"
 #define PLUG_UNIQUE_ID 'gt1'
 #define PLUG_MFR_ID 'tilr'
 #define PLUG_URL_STR "https://github.com/tiagolr/gate1"
@@ -29,8 +29,8 @@
 #define PLUG_FPS 60
 #define PLUG_SHARED_RESOURCES 0
 #define PLUG_HOST_RESIZE 1
-#define PLUG_MIN_WIDTH 256
-#define PLUG_MIN_HEIGHT 256
+#define PLUG_MIN_WIDTH 540
+#define PLUG_MIN_HEIGHT 540
 #define PLUG_MAX_WIDTH 8192
 #define PLUG_MAX_HEIGHT 8192
 
