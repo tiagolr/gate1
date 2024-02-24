@@ -1,7 +1,7 @@
 #define PLUG_NAME "GATE1"
 #define PLUG_MFR "tilr"
-#define PLUG_VERSION_HEX 0x00010003
-#define PLUG_VERSION_STR "1.0.3"
+#define PLUG_VERSION_HEX 0x00010004
+#define PLUG_VERSION_STR "1.0.4"
 #define PLUG_UNIQUE_ID 'gt1'
 #define PLUG_MFR_ID 'tilr'
 #define PLUG_URL_STR "https://github.com/tiagolr/gate1"
