@@ -1,6 +1,6 @@
 # Project Archived
 
-This project is archived, development has shifted to [GATE-12](https://github.com/tiagolr/gate12), a newer version of this plugin rebuilt from the ground up using the JUCE framework. Includes new features and many improvements and fixes.
+This project is archived, development has shifted to [GATE-12](https://github.com/tiagolr/gate12), a newer version of this plugin rebuilt from the ground up using the JUCE framework. It includes new features and many improvements and fixes.
 
 # GATE1
 
