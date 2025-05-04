@@ -1,3 +1,7 @@
+# Project Archived
+
+This project is archived, development has shifted to [GATE-12](https://github.com/tiagolr/gate12), a newer version of this plugin rebuilt from the ground up using the JUCE framework. Includes new features and many improvements and fixes.
+
 # GATE1
 
 GATE1 is an envelope generator for gate/volume control. It is a port of [GATE-1 JSFX](https://github.com/tiagolr/tilr_jsfx?tab=readme-ov-file#gate-1) to C++ using [Iplug2](https://iplug2.github.io/)
